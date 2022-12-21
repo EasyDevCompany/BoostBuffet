@@ -58,6 +58,8 @@ class Settings(BaseSettings):
     PYTHON_ENV: EnvEnum = EnvEnum.development
     BOT_TOKEN: str
 
+    WEBAPP_URL: str
+
     class Config:
         case_sensitive = True
 

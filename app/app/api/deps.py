@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import Depends, Header, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from dependency_injector.wiring import inject, Provide
 from app.core.containers import Container
@@ -7,12 +7,22 @@ from app.db.session import scope
 from uuid import uuid4
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
-
-
 @inject
 async def create_session():
     scope.set(str(uuid4()))
+
+
+@inject
+async def bot_token_verification(
+        token: str = Header(default=None, alias="TOKEN"),
+        repository_telegram_user = Depends(Provide[Container.repository_telegram_user])
+):
+    if not token:
+        raise HTTPException(403)
+    user = repository_telegram_user.get(id=token)
+    if not user or not token:
+        raise HTTPException(403)
+    return token
 
 
 @inject

@@ -26,12 +26,10 @@ class TelegramUser(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
     telegram_id = Column(BigInteger, unique=True, index=True)
     username = Column(String, nullable=True)
-    first_name = Column(String, nullable=True)
     registration_date = Column(DateTime, default=datetime.datetime.utcnow)
-    date_of_birth = Column(DateTime, nullable=True)
     type = Column(Enum(UserType))
-    raiting = Column(Float(precision=1))
-    likes_amount = Column(Integer)
+    raiting = Column(Float(precision=1), default=0)
+    likes_amount = Column(Integer, default=0)
 
     def __str__(self) -> str:
         return str(self.telegram_id) + " " + self.username if self.username else ""

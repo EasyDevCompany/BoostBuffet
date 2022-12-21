@@ -6,6 +6,8 @@ from app.core.config import Settings
 from app.core.celery import celery_app
 from app.db.session import SyncSession
 
+from app.repository.telegram_user import TelegramUser, RepositoryTelegramUser
+
 
 from app import redis
 
@@ -49,6 +51,8 @@ class Container(containers.DeclarativeContainer):
     config = providers.Singleton(Settings)
     # Database block
     db = providers.Singleton(SyncSession, db_url=config.provided.SYNC_SQLALCHEMY_DATABASE_URI)
+
+    repository_telegram_user = providers.Singleton(RepositoryTelegramUser, model=TelegramUser, session=db)
 
     redis_pool = providers.Resource(
         redis.init_redis_pool,

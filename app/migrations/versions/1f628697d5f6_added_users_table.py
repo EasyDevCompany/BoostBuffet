@@ -22,12 +22,10 @@ def upgrade():
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('telegram_id', sa.BigInteger(), nullable=True),
     sa.Column('username', sa.String(), nullable=True),
-    sa.Column('first_name', sa.String(), nullable=True),
     sa.Column('registration_date', sa.DateTime(), nullable=True),
-    sa.Column('date_of_birth', sa.DateTime(), nullable=True),
     sa.Column('type', sa.Enum('active', 'blocked', name='usertype'), nullable=True),
-    sa.Column('raiting', sa.Float(precision=1), nullable=True),
-    sa.Column('likes_amount', sa.Integer(), nullable=True),
+    sa.Column('raiting', sa.Float(precision=1), nullable=True, default=0),
+    sa.Column('likes_amount', sa.Integer(), nullable=True, default=0),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_telegramusers_id'), 'telegramusers', ['id'], unique=False)

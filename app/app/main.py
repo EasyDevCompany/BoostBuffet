@@ -1,5 +1,6 @@
 from app.api.api_v1 import api
 from app.api import deps
+from app.api.api_v1.endpoints import webhook
 from fastapi import FastAPI, Response
 from app.core.config import settings
 from app.core.containers import Container
@@ -10,7 +11,7 @@ from pathlib import Path
 
 def create_app():
     container = Container()
-    container.wire(modules=[deps,])
+    container.wire(modules=[deps, webhook])
     fastapi_app = FastAPI(
         title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json"
     )
