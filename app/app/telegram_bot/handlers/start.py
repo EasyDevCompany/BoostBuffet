@@ -7,7 +7,7 @@ from aiogram.dispatcher.filters.builtin import CommandStart
 
 from app.telegram_bot.loader import bot, dp
 
-from app.core.containers import Container, SyncSession, TelegramUser
+from app.core.containers import Container, TelegramUser
 from app.db.session import scope
 from app.telegram_bot import const
 from app.telegram_bot.keyboards.start_menu import get_menu_button, get_menu_web_app
@@ -22,10 +22,12 @@ async def process_start_command(
     scope.set(str(uuid4))
     user = rep_telegram_user.get(telegram_id=int(message.from_user.id))
     if not user:
+        res = Container.telegraph.create_account(short_name=message.from_user.username)
         user = rep_telegram_user.create(
             obj_in={
                 "telegram_id": message.from_user.id,
                 "username": message.from_user.username,
+                "telegraph_access_token": res.get("access_token"),
                 "type": TelegramUser.UserType.active,
                 "raiting": 0
             }, commit=True)

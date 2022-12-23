@@ -14,7 +14,7 @@ x-function: &python
 
 services:
   app_db:
-    container_name: buffet_db
+    container_name: buffet_db_app
     image: postgres:11
     volumes: 
       - app_db-p2p:/var/lib/postgresql/data/pgdata:rw

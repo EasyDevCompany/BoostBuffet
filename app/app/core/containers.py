@@ -1,13 +1,16 @@
 """Containers module."""
+from telegraph import Telegraph
+
 from dependency_injector import containers, providers
-import json
 
 from app.core.config import Settings
 from app.core.celery import celery_app
 from app.db.session import SyncSession
 
 from app.repository.telegram_user import TelegramUser, RepositoryTelegramUser
+from app.repository.posts import Posts, RepositoryPosts
 
+from app.services.posts import PostsService
 
 from app import redis
 
@@ -51,8 +54,16 @@ class Container(containers.DeclarativeContainer):
     config = providers.Singleton(Settings)
     # Database block
     db = providers.Singleton(SyncSession, db_url=config.provided.SYNC_SQLALCHEMY_DATABASE_URI)
+    telegraph = Telegraph()
 
     repository_telegram_user = providers.Singleton(RepositoryTelegramUser, model=TelegramUser, session=db)
+    repository_posts = providers.Singleton(RepositoryPosts, model=Posts, session=db)
+
+    posts_service = providers.Singleton(
+        PostsService,
+        repository_telegram_user=repository_telegram_user,
+        repository_posts=repository_posts,
+    )
 
     redis_pool = providers.Resource(
         redis.init_redis_pool,
