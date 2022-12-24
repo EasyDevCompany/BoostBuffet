@@ -28,6 +28,7 @@ class Posts(Base):
     telegraph_url = Column(String)
     path = Column(String)
     title = Column(String)
+    content = Column(String)
 
     status = Column(Enum(PostStatus), default=PostStatus.not_published)
     views_amount = Column(Integer, default=0)

@@ -28,32 +28,43 @@ async def create_post(
     )
 
 
-@router.post("/edit_post/{post_id}")
+@router.post("/edit_post")
 @inject
 async def edit_post(
-        post_id: str,
-        title: Optional[str],
-        content: Optional[str],
+        post_url: str,
+        title: Optional[str] = None,
+        content: Optional[str] = None,
         token = Depends(bot_token_verification),
         posts_service = Depends(Provide[Container.posts_service])):
     return await posts_service.edit_post(
         user_id=token,
-        post_id=post_id,
+        post_url=post_url,
         title=title,
         content=content
     )
 
 
-@router.post("/update_status/{post_id}")
+@router.get("/user_posts/{user_id}")
 @inject
-async def update_status(
-        post_id: str,
-        status: str,
+async def user_posts(
+        user_id: str,
         token = Depends(bot_token_verification),
         posts_service = Depends(Provide[Container.posts_service])):
-    return await posts_service.update_status(
-        user_id=token,
-        post_id=post_id,
-        status=status
+    return await posts_service.all_posts(
+        user_id=user_id,
     )
+
+
+# @router.post("/update_status/{post_id}")
+# @inject
+# async def update_status(
+#         post_id: str,
+#         status: str,
+#         token = Depends(bot_token_verification),
+#         posts_service = Depends(Provide[Container.posts_service])):
+#     return await posts_service.update_status(
+#         user_id=token,
+#         post_id=post_id,
+#         status=status
+#     )
 

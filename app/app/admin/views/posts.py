@@ -7,6 +7,7 @@ class PostsView(ModelView):
         "telegraph_url",
         "path",
         "title",
+        "content",
         "status",
         "views_amount",
         "likes_amount",
