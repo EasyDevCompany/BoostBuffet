@@ -1,7 +1,4 @@
-from fastapi import APIRouter, Depends
-
-from aiogram import types, Dispatcher, Bot
-from aiogram.utils.exceptions import BotBlocked
+from fastapi import APIRouter, Depends, UploadFile, File
 
 from dependency_injector.wiring import inject, Provide
 
@@ -53,6 +50,19 @@ async def user_posts(
     return await posts_service.all_posts(
         user_id=user_id,
     )
+
+
+@router.post('/upload_image')
+@inject
+async def upload_image(
+        image: UploadFile = File(...),
+        token = Depends(bot_token_verification),
+        posts_service = Depends(Provide[Container.posts_service])):
+    return await posts_service.upload_image(
+        user_id=token,
+        image=image
+    )
+
 
 
 # @router.post("/update_status/{post_id}")

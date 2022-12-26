@@ -23,14 +23,13 @@ def create_app():
         allow_headers=["*"],  # Allows all headers
     )
     fastapi_app.container = container
-    # static for future
 
-    # current_file = Path(__file__)
-    # current_file_dir = current_file.parent
-    # project_root = current_file_dir.parent
-    # project_root_absolute = project_root.resolve()
-    # static_root_absolute = project_root_absolute / "image"
-    # fastapi_app.mount("/image", StaticFiles(directory=static_root_absolute), name="image")
+    current_file = Path(__file__)
+    current_file_dir = current_file.parent
+    project_root = current_file_dir.parent
+    project_root_absolute = project_root.resolve()
+    static_root_absolute = project_root_absolute / "image"
+    fastapi_app.mount("/image", StaticFiles(directory=static_root_absolute), name="image")
     fastapi_app.include_router(api.api_router, prefix=settings.API_V1_STR)
     return fastapi_app
 

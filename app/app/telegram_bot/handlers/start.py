@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from aiogram import types
 from uuid import uuid4
 
@@ -31,6 +33,7 @@ async def process_start_command(
                 "type": TelegramUser.UserType.active,
                 "raiting": 0
             }, commit=True)
+        await create_folder_for_user_image(telegram_id=message.from_user.id)
         await bot.send_message(message.from_user.id, const.START_TEXT, reply_markup=get_menu_button())
     else:
         await bot.send_message(message.from_user.id, f"{const.START_TEXT} {user.username}", reply_markup=get_menu_button())
@@ -38,3 +41,10 @@ async def process_start_command(
             chat_id=message.chat.id,
             menu_button=get_menu_web_app()
         )
+
+
+async def create_folder_for_user_image(telegram_id):
+    current_file = Path(__file__)
+    current_file_dir = current_file.parent
+    project_root = current_file_dir.parent.parent.parent / f"image/{telegram_id}"
+    project_root.mkdir(parents=True, exist_ok=True)

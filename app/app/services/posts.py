@@ -1,3 +1,6 @@
+from pathlib import Path
+from random import randint
+
 from fastapi.responses import JSONResponse
 
 from telegraph import Telegraph
@@ -113,6 +116,27 @@ class PostsService:
             self,
             user_id: str,):
         return self._repository_posts.list(author_id=user_id)
+
+    async def upload_image(
+            self,
+            user_id: str,
+            image):
+        user = self._repository_telegram_user.get(id=user_id)
+
+        current_file = Path(__file__)
+        current_file_dir = current_file.parent
+        project_root = current_file_dir.parent.parent / f"image/{user.telegram_id}"
+        project_root_absolute = project_root.resolve()
+        random_name = randint(1, 100_000)
+        static_root_absolute = project_root_absolute / f"{random_name}.png"
+        file_location = static_root_absolute
+        with open(file_location, "wb+") as file_object:
+            image.filename = f"{random_name}.png"
+            file_object.write(image.file.read())
+        return JSONResponse(
+            status_code=200,
+            content={"img_url": f"https://4eb4-178-176-77-55.eu.ngrok.io/image/{user.telegram_id}/{image.filename}"}
+        )
 
     async def update_status(self, post_id: str, user_id: str, status: str):
         user = self._repository_telegram_user.get(id=user_id)
