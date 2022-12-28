@@ -6,8 +6,6 @@ from fastapi.responses import JSONResponse
 from telegraph import Telegraph
 from telegraph.exceptions import TelegraphException
 
-# from aiogram.me
-
 from typing import Optional
 
 from app.models.telegram_user import TelegramUser
@@ -20,6 +18,7 @@ from app.telegram_bot.loader import bot
 
 
 class PostsService:
+
     def __init__(
             self,
             repository_telegram_user: RepositoryTelegramUser,
@@ -67,7 +66,7 @@ class PostsService:
                 return JSONResponse(status_code=400, content="Слишком длинный заголовок")
             if str(er) == "ACCESS_TOKEN_INVALID":
                 return JSONResponse(status_code=400, content="Неверный токен!")
-            return "Неизвестная ошибка, попробуйте еще раз."
+            return JSONResponse(status_code=400, content="Неизвестная ошибка, попробуйте еще раз.")
 
         return f"Пост {post.telegraph_url} отправлен на модерацию"
 
@@ -108,14 +107,46 @@ class PostsService:
                 return JSONResponse(status_code=400, content="Слишком длинный заголовок")
             if str(er) == "ACCESS_TOKEN_INVALID":
                 return JSONResponse(status_code=400, content="Неверный токен!")
-            return "Неизвестная ошибка, попробуйте еще раз."
+            return JSONResponse(status_code=400, content="Неизвестная ошибка, попробуйте еще раз.")
 
         return f"Пост {post.telegraph_url} отредактирован"
 
-    async def all_posts(
+    async def all_user_posts(
             self,
             user_id: str,):
-        return self._repository_posts.list(author_id=user_id)
+        return self._repository_posts.list(author_id=user_id, status=Posts.PostStatus.draft)
+
+    async def my_draft_posts(
+            self,
+            user_id: str):
+        posts = self._repository_posts.list(author_id=user_id, status=Posts.PostStatus.draft)
+        # TODO переписать на схемы
+        representaion = {
+            "posts": posts,
+            "draft_count": self._repository_posts.count(author_id=user_id)[0]
+        }
+        return representaion
+
+    async def my_published_posts(
+            self,
+            user_id: str):
+        return self._repository_posts.list(author_id=user_id, status=Posts.PostStatus.published)
+
+    async def popular_posts(self):
+        return self._repository_posts.most_popular()
+
+    async def recent_posts(self):
+        return self._repository_posts.most_recent()
+
+    async def my_feed(self, user_id: str):
+        """
+        Возвращает список постов пользователей, на которых подписан юзер с id=user_id.
+        """
+        # TODO Переписать в репозиторий
+        followings = self._repository_telegram_user.get(id=user_id).followings
+        followings_ids = [following.id for following in followings]
+        print(followings_ids)
+        return self._repository_posts.feed(followings_ids=followings_ids)
 
     async def upload_image(
             self,
@@ -157,11 +188,11 @@ class PostsService:
                 f'Ваш пост <a href="{post.telegraph_url}">{post.title}</a> был опубликован',
                 parse_mode='HTML'
             )
-            return f"Новый статус: опубликован"
+            return JSONResponse(status_code=400, content="Новый статус: опубликован")
 
         await bot.send_message(
             post.author.telegram_id,
             f'Ваш пост <a href="{post.telegraph_url}">{post.title}</a> не прошел модерацию.',
             parse_mode='HTML'
         )
-        return f"Новый статус: не прошёл модерацию"
+        return JSONResponse(status_code=400, content="Новый статус: не прошёл модерацию.")

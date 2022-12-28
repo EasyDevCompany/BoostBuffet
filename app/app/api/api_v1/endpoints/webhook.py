@@ -27,12 +27,3 @@ async def bot_webhook(update: Webhook):
     except BotBlocked:
         pass
     return Response()
-
-
-@router.get("/check")
-@inject
-async def check(
-        token = Depends(bot_token_verification),
-        repository_telegram_user = Depends(Provide[Container.repository_telegram_user])):
-    return repository_telegram_user.get(id=token)
-

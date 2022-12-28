@@ -7,10 +7,10 @@ from sqlalchemy import select
 from app.db.session import SyncSession, scope
 from app.core.config import settings
 
-from app.models.telegram_user import TelegramUser
+from app.models.telegram_user import TelegramUser, FollowRelationship
 from app.models.posts import Posts
 
-from app.admin.views.user import TelegramUserView
+from app.admin.views.user import TelegramUserView, FollowRelationView
 from app.admin.views.posts import PostsView
 
 
@@ -59,6 +59,7 @@ secureApp.wsgi_app = middleware(secureApp.wsgi_app)
 admin = Admin(secureApp, name='Admin', base_template='my_master.html', template_mode='bootstrap4')
 # Create a ModelView to add to our administrative interface
 admin.add_view(TelegramUserView(TelegramUser, session.session))
+admin.add_view(FollowRelationView(FollowRelationship, session.session))
 admin.add_view(PostsView(Posts, session.session))
 # Add administrative views to Flask-Admin
 

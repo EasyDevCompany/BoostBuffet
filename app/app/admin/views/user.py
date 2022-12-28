@@ -11,4 +11,13 @@ class TelegramUserView(ModelView):
         "type",
         "raiting",
         "likes_amount",
+        "followings",
+    ]
+
+
+class FollowRelationView(ModelView):
+    column_list = [
+        "id",
+        "FollowerID",
+        "FollowingID",
     ]

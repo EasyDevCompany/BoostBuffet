@@ -7,14 +7,26 @@ from sqlalchemy import (
     DateTime,
     Enum,
     ForeignKey,
-    Float
+    Float,
+    Table
 )
+from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.sql import func
 from uuid import uuid4
 import enum
 import datetime
 
+
+class FollowRelationship(Base):
+    __tablename__ = 'follow_relationship'
+    id = Column(
+        UUID(as_uuid=True),
+        default=uuid4,
+        primary_key=True,
+        index=True
+    )
+    FollowerID = Column(UUID, ForeignKey('telegramusers.id'), primary_key=True)
+    FollowingID = Column(UUID, ForeignKey('telegramusers.id'), primary_key=True)
 
 class TelegramUser(Base):
     __tablename__ = "telegramusers"
@@ -38,5 +50,15 @@ class TelegramUser(Base):
     raiting = Column(Float(precision=1), default=0)
     likes_amount = Column(Integer, default=0)
 
+    followings = relationship(
+        "TelegramUser",
+        secondary=FollowRelationship.__tablename__,
+        primaryjoin=id == FollowRelationship.FollowerID,
+        secondaryjoin=id == FollowRelationship.FollowingID,
+        backref="followers",
+    )
+
     def __str__(self) -> str:
         return str(self.telegram_id) + " " + self.username if self.username else ""
+
+
