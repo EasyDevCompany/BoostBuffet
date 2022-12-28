@@ -7,10 +7,11 @@ from app.core.config import Settings
 from app.core.celery import celery_app
 from app.db.session import SyncSession
 
-from app.repository.telegram_user import TelegramUser, RepositoryTelegramUser
+from app.repository.telegram_user import TelegramUser, FollowRelationship, RepositoryTelegramUser, RepositoryFollowRelationship
 from app.repository.posts import Posts, RepositoryPosts
 
 from app.services.posts import PostsService
+from app.services.follow_relation import FollowService
 
 from app import redis
 
@@ -57,12 +58,18 @@ class Container(containers.DeclarativeContainer):
     telegraph = Telegraph()
 
     repository_telegram_user = providers.Singleton(RepositoryTelegramUser, model=TelegramUser, session=db)
+    repository_follow_relation = providers.Singleton(RepositoryFollowRelationship, model=FollowRelationship, session=db)
     repository_posts = providers.Singleton(RepositoryPosts, model=Posts, session=db)
 
     posts_service = providers.Singleton(
         PostsService,
         repository_telegram_user=repository_telegram_user,
         repository_posts=repository_posts,
+    )
+    follow_service = providers.Singleton(
+        FollowService,
+        repository_telegram_user=repository_telegram_user,
+        repository_follow_relation=repository_follow_relation,
     )
 
     redis_pool = providers.Resource(
