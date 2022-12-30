@@ -7,6 +7,15 @@ from datetime import datetime
 from app.models.posts import Posts
 
 
+class PostIn(BaseModel):
+    title: str
+    subtitle: str
+    content: str
+
+    class Config:
+        orm_mode = True
+
+
 class DefaultPosts(BaseModel):
     telegraph_url: str
     title: str
