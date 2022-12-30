@@ -46,6 +46,9 @@ class RepositoryBase(Generic[ModelType, ]):
         self._session.flush()
         return db_obj
 
-    def delete(self, *args, db_obj: Optional[ModelType], **kwargs) -> ModelType:
+    def delete(self, commit=False, *args, db_obj: Optional[ModelType], **kwargs,) -> ModelType:
         self._session.delete(db_obj)
         self._session.flush()
+        if commit:
+            self._session.commit()
+
