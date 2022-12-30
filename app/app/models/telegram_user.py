@@ -25,8 +25,8 @@ class FollowRelationship(Base):
         primary_key=True,
         index=True
     )
-    FollowerID = Column(UUID, ForeignKey('telegramusers.id'), primary_key=True)
-    FollowingID = Column(UUID, ForeignKey('telegramusers.id'), primary_key=True)
+    FollowerID = Column(UUID(as_uuid=True), ForeignKey('telegramusers.id'), primary_key=True)
+    FollowingID = Column(UUID(as_uuid=True), ForeignKey('telegramusers.id'), primary_key=True)
 
 class TelegramUser(Base):
     __tablename__ = "telegramusers"
