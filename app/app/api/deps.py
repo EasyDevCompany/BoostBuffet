@@ -19,10 +19,10 @@ async def bot_token_verification(
 ):
     if not token:
         raise HTTPException(403)
-    user = repository_telegram_user.get(id=token)
+    user = repository_telegram_user.get(telegram_id=token)
     if not user or not token:
         raise HTTPException(403)
-    return token
+    return user.id
 
 
 @inject
