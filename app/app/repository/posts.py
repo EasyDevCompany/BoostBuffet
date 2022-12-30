@@ -7,20 +7,20 @@ from app.models.telegram_user import TelegramUser
 
 
 class RepositoryPosts(RepositoryBase[Posts]):
-    def count(self, author_id: str):
+    def count_draft_posts(self, author_id: str):
         return self._session.query(
             func.count(self._model.id)
-            ).filter_by(author_id=author_id).first()
+            ).filter_by(author_id=author_id, status=Posts.PostStatus.draft).first()
 
     def most_popular(self,):
         return self._session.query(
             self._model
-            ).order_by(self._model.likes_amount.desc()).all()
+            ).filter_by(status=Posts.PostStatus.published).order_by(self._model.likes_amount.desc()).all()
 
     def most_recent(self,):
         return self._session.query(
             self._model
-            ).order_by(self._model.created_at.desc()).all()
+            ).filter_by(status=Posts.PostStatus.published).order_by(self._model.created_at.desc()).all()
 
     def feed(self, followings_ids):
         return self._session.query(
@@ -29,4 +29,5 @@ class RepositoryPosts(RepositoryBase[Posts]):
                 joinedload(self._model.author),
             ).filter(
                 self._model.author_id.in_(followings_ids),
+                self._model.status == Posts.PostStatus.published
             ).all()
