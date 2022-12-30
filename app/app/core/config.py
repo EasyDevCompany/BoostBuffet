@@ -59,6 +59,7 @@ class Settings(BaseSettings):
     BOT_TOKEN: str
 
     WEBAPP_URL: str
+    SERVER_IP: str
 
     class Config:
         case_sensitive = True
