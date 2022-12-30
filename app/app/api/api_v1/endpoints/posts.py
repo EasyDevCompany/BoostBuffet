@@ -6,25 +6,21 @@ from typing import Optional
 
 from app.core.containers import Container
 from app.api.deps import bot_token_verification
-from app.schemas.posts import PublishedPosts, DraftPosts, DefaultPosts
+from app.schemas.posts import PublishedPosts, DraftPosts, DefaultPosts, PostIn
 
-
-# TODO Сделать модерацию
-# TODO Схема на получение черновых постов
 
 router = APIRouter()
+
 
 @router.post("/create_post")
 @inject
 async def create_post(
-        title: str,
-        content: str,
+        data: PostIn,
         token = Depends(bot_token_verification),
         posts_service = Depends(Provide[Container.posts_service])):
     return await posts_service.create_post(
         user_id=token,
-        title=title,
-        content=content
+        post_in=data
     )
 
 
@@ -44,16 +40,33 @@ async def upload_image(
 @inject
 async def edit_post(
         post_url: str,
-        title: Optional[str] = None,
-        content: Optional[str] = None,
+        data: PostIn,
         token = Depends(bot_token_verification),
         posts_service = Depends(Provide[Container.posts_service])):
     return await posts_service.edit_post(
         user_id=token,
         post_url=post_url,
-        title=title,
-        content=content
-    )
+        post_in=data,)
+
+
+@router.post("/delete_post")
+@inject
+async def delete_post(
+        post_url: str,
+        token = Depends(bot_token_verification),
+        posts_service = Depends(Provide[Container.posts_service])):
+    return await posts_service.delete_post(
+        user_id=token,
+        post_url=post_url,)
+
+
+# @router.get("/like_post/{post_url}")
+# @inject
+# async def like_post(
+#         post_url: str,
+#         token = Depends(bot_token_verification),
+#         posts_service = Depends(Provide[Container.posts_service])):
+#     return await posts_service.like_post(user_id=token, post_url=post_url,)
 
 
 @router.get("/user_posts/{user_id}", response_model=list[PublishedPosts])
@@ -67,51 +80,25 @@ async def user_posts(
     )
 
 
-@router.get("/my_draft_posts")
+@router.get("/my_posts")
 @inject
-async def my_draft_posts(
+async def my_posts(
         token = Depends(bot_token_verification),
         posts_service = Depends(Provide[Container.posts_service])):
-    return await posts_service.my_draft_posts(
+    return await posts_service.my_posts(
         user_id=token,
     )
 
 
-@router.get("/my_published_posts", response_model=list[PublishedPosts])
+@router.get("/all_types_posts")
 @inject
-async def my_published_posts(
-        token = Depends(bot_token_verification),
-        posts_service = Depends(Provide[Container.posts_service])):
-    return await posts_service.my_published_posts(
-        user_id=token,
-    )
-
-
-@router.get("/popular_posts", response_model=list[PublishedPosts])
-@inject
-async def popular_posts(
-        token = Depends(bot_token_verification),
-        posts_service = Depends(Provide[Container.posts_service])):
-    return await posts_service.popular_posts()
-
-
-@router.get("/recent_posts", response_model=list[PublishedPosts])
-@inject
-async def recent_posts(
-        token = Depends(bot_token_verification),
-        posts_service = Depends(Provide[Container.posts_service])):
-    return await posts_service.recent_posts()
-
-
-@router.get("/my_feed", response_model=list[PublishedPosts])
-@inject
-async def my_feed(
+async def all_types_posts(
         token = Depends(bot_token_verification),
         posts_service = Depends(Provide[Container.posts_service])):
     """
     Возвращает список постов из ленты.
     """
-    return await posts_service.my_feed(user_id=token)
+    return await posts_service.all_types_posts(user_id=token)
 
 
 # @router.post("/update_status/{post_id}")
