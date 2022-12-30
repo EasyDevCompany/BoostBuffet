@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from telegraph import Telegraph
 from telegraph.exceptions import TelegraphException
 
-from typing import Optional
+from app.core.config import settings
 
 from app.models.telegram_user import TelegramUser
 from app.models.posts import Posts
@@ -15,6 +15,8 @@ from app.repository.posts import RepositoryPosts, Posts
 from app.repository.telegram_user import RepositoryTelegramUser
 
 from app.telegram_bot.loader import bot
+
+from app.schemas.posts import PostIn
 
 
 class PostsService:
@@ -27,20 +29,20 @@ class PostsService:
         self._repository_telegram_user = repository_telegram_user
         self._repository_posts = repository_posts
 
-    async def create_post(self, user_id: str, title: Optional[str], content: str):
+    async def create_post(self, user_id: str, post_in: PostIn):
         user = self._repository_telegram_user.get(id=user_id)
         telegraph = Telegraph(user.telegraph_access_token)
         try:
             post = telegraph.create_page(
-                title or '',
-                html_content=content
+                post_in.title or '',
+                html_content=post_in.content
             )
             post = self._repository_posts.create(
                 obj_in={
                     "telegraph_url": post.get("url"),
                     "path": post.get("path"),
                     "title": post.get("title"),
-                    "content": content,
+                    "content": post_in.content,
                     "status": Posts.PostStatus.published,
                     "author": user,
                 }, commit=True)
@@ -63,10 +65,10 @@ class PostsService:
 
         except TelegraphException as er:
             if str(er) == "TITLE_TOO_LONG":
-                return JSONResponse(status_code=400, content="Слишком длинный заголовок")
+                return JSONResponse(status_code=400, content={"error": "Слишком длинный заголовок"})
             if str(er) == "ACCESS_TOKEN_INVALID":
-                return JSONResponse(status_code=400, content="Неверный токен!")
-            return JSONResponse(status_code=400, content="Неизвестная ошибка, попробуйте еще раз.")
+                return JSONResponse(status_code=400, content={"error": "Неверный токен!"})
+            return JSONResponse(status_code=400, content={"error": "Неизвестная ошибка, попробуйте еще раз."})
 
         return f"Пост {post.telegraph_url} отправлен на модерацию"
 
@@ -74,26 +76,24 @@ class PostsService:
             self,
             user_id: str,
             post_url: str,
-            title: Optional[str],
-            content: Optional[str]):
-
+            post_in: PostIn,):
         user = self._repository_telegram_user.get(id=user_id)
         post = self._repository_posts.get(telegraph_url=post_url)
         if post.author != user:
-            return JSONResponse(status_code=403, content="Вы не являетесь автором поста")
+            return JSONResponse(status_code=403, content={"error": "Вы не являетесь автором поста"})
 
         telegraph = Telegraph(user.telegraph_access_token)
         try:
             telegraph.edit_page(
                 path=post.path,
-                title=title or post.title,
-                html_content=content or post.content
+                title=post_in.title or post.title,
+                html_content=post_in.content or post.content
             )
             self._repository_posts.update(
                 db_obj=post,
                 obj_in={
-                    "title": title or post.title,
-                    "content": content or post.content,
+                    "title": post_in.title or post.title,
+                    "content": post_in.content or post.content,
                     "status": Posts.PostStatus.published
                 }
             )
@@ -104,39 +104,37 @@ class PostsService:
             )
         except TelegraphException as er:
             if str(er) == "TITLE_TOO_LONG":
-                return JSONResponse(status_code=400, content="Слишком длинный заголовок")
+                return JSONResponse(status_code=400, content={"error": "Слишком длинный заголовок"})
             if str(er) == "ACCESS_TOKEN_INVALID":
-                return JSONResponse(status_code=400, content="Неверный токен!")
-            return JSONResponse(status_code=400, content="Неизвестная ошибка, попробуйте еще раз.")
+                return JSONResponse(status_code=400, content={"error": "Неверный токен!"})
+            return JSONResponse(status_code=400, content={"error": "Неизвестная ошибка, попробуйте еще раз."})
 
         return f"Пост {post.telegraph_url} отредактирован"
+
+    async def delete_post(self, user_id: str, post_url: str):
+        post = self._repository_posts.get(telegraph_url=post_url)
+        if post.author_id != user_id:
+            return JSONResponse(cstatus_code=403, content={"error": "Вы не являетесь автором поста"})
+        return self._repository_posts.delete(db_obj=post, commit=True)
+
+    async def like_post(self, user_id: str, post_url: str):
+        post = self._repository_posts.get(telegraph_url=post_url)
 
     async def all_user_posts(
             self,
             user_id: str,):
-        return self._repository_posts.list(author_id=user_id, status=Posts.PostStatus.draft)
-
-    async def my_draft_posts(
-            self,
-            user_id: str):
-        posts = self._repository_posts.list(author_id=user_id, status=Posts.PostStatus.draft)
-        # TODO переписать на схемы
-        representaion = {
-            "posts": posts,
-            "draft_count": self._repository_posts.count(author_id=user_id)[0]
-        }
-        return representaion
-
-    async def my_published_posts(
-            self,
-            user_id: str):
+        user_id = self._repository_telegram_user.get(telegram_id=user_id).id
         return self._repository_posts.list(author_id=user_id, status=Posts.PostStatus.published)
 
-    async def popular_posts(self):
-        return self._repository_posts.most_popular()
-
-    async def recent_posts(self):
-        return self._repository_posts.most_recent()
+    async def my_posts(self, user_id: str):
+        representation = {
+            "published": self._repository_posts.list(author_id=user_id, status=Posts.PostStatus.published),
+            "draft": {
+                "posts": self._repository_posts.list(author_id=user_id, status=Posts.PostStatus.draft),
+                "draft_count": self._repository_posts.count_draft_posts(author_id=user_id)[0]
+            }
+        }
+        return representation
 
     async def my_feed(self, user_id: str):
         """
@@ -145,8 +143,17 @@ class PostsService:
         # TODO Переписать в репозиторий
         followings = self._repository_telegram_user.get(id=user_id).followings
         followings_ids = [following.id for following in followings]
-        print(followings_ids)
         return self._repository_posts.feed(followings_ids=followings_ids)
+
+    async def all_types_posts(self, user_id: str):
+        followings = self._repository_telegram_user.get(id=user_id).followings
+        followings_ids = [following.id for following in followings]
+        representaion = {
+            "popular": self._repository_posts.most_popular(),
+            "recent": self._repository_posts.most_recent(),
+            "my_feed": self._repository_posts.feed(followings_ids=followings_ids)
+        }
+        return representaion
 
     async def upload_image(
             self,
@@ -166,13 +173,13 @@ class PostsService:
             file_object.write(image.file.read())
         return JSONResponse(
             status_code=200,
-            content={"img_url": f"https://4eb4-178-176-77-55.eu.ngrok.io/image/{user.telegram_id}/{image.filename}"}
+            content={"img_url": f"{settings.SERVER_IP}/image/{user.telegram_id}/{image.filename}"}
         )
 
     async def update_status(self, post_id: str, user_id: str, status: str):
         user = self._repository_telegram_user.get(id=user_id)
         if user.role != TelegramUser.UserRole.moderator:
-            return JSONResponse(status_code=403, content="У вас нет на это прав")
+            return JSONResponse(status_code=403, content={"error": "У вас нет на это прав"})
 
         post = self._repository_posts.get(id=post_id)
         post = self._repository_posts.update(
@@ -188,11 +195,11 @@ class PostsService:
                 f'Ваш пост <a href="{post.telegraph_url}">{post.title}</a> был опубликован',
                 parse_mode='HTML'
             )
-            return JSONResponse(status_code=400, content="Новый статус: опубликован")
+            return JSONResponse(status_code=400, content={"error": "Новый статус: опубликован"})
 
         await bot.send_message(
             post.author.telegram_id,
             f'Ваш пост <a href="{post.telegraph_url}">{post.title}</a> не прошел модерацию.',
             parse_mode='HTML'
         )
-        return JSONResponse(status_code=400, content="Новый статус: не прошёл модерацию.")
+        return JSONResponse(status_code=400, content={"error": "Новый статус: не прошёл модерацию."})
