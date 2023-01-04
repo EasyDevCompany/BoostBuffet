@@ -117,9 +117,6 @@ class PostsService:
             return JSONResponse(cstatus_code=403, content={"error": "Вы не являетесь автором поста"})
         return self._repository_posts.delete(db_obj=post, commit=True)
 
-    async def like_post(self, user_id: str, post_url: str):
-        post = self._repository_posts.get(telegraph_url=post_url)
-
     async def all_user_posts(
             self,
             user_id: str,):
@@ -135,15 +132,6 @@ class PostsService:
             }
         }
         return representation
-
-    async def my_feed(self, user_id: str):
-        """
-        Возвращает список постов пользователей, на которых подписан юзер с id=user_id.
-        """
-        # TODO Переписать в репозиторий
-        followings = self._repository_telegram_user.get(id=user_id).followings
-        followings_ids = [following.id for following in followings]
-        return self._repository_posts.feed(followings_ids=followings_ids)
 
     async def all_types_posts(self, user_id: str):
         followings = self._repository_telegram_user.get(id=user_id).followings
