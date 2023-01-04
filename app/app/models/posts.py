@@ -1,22 +1,20 @@
 from app.db.base_class import Base
 from sqlalchemy import (
     Column,
-    BigInteger,
     Integer,
     String,
     DateTime,
     Enum,
     ForeignKey,
-    Float
 )
-from sqlalchemy.orm import relationship, column_property
+from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from uuid import uuid4
 import enum
 import datetime
 
-
 from app.utils.get_post_views import get_views
+
 
 class Posts(Base):
     __tablename__ = "posts"
@@ -46,17 +44,3 @@ class Posts(Base):
     @property
     def views_amount(self):
         return get_views(self.path)
-
-
-# class Likes(Base):
-#     __tablename__ = "likes"
-
-#     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
-#     post_id = author_id = Column(
-#         UUID(as_uuid=True),
-#         ForeignKey("posts.id"),
-#     )
-#     like_author = Column(
-#         UUID(as_uuid=True),
-#         ForeignKey("telegramusers.id"),
-#     )
