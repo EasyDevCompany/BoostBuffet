@@ -60,15 +60,6 @@ async def delete_post(
         post_url=post_url,)
 
 
-# @router.get("/like_post/{post_url}")
-# @inject
-# async def like_post(
-#         post_url: str,
-#         token = Depends(bot_token_verification),
-#         posts_service = Depends(Provide[Container.posts_service])):
-#     return await posts_service.like_post(user_id=token, post_url=post_url,)
-
-
 @router.get("/user_posts/{user_id}", response_model=list[PublishedPosts])
 @inject
 async def user_posts(
