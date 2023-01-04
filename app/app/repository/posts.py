@@ -3,7 +3,6 @@ from sqlalchemy.orm import joinedload
 
 from .base import RepositoryBase
 from app.models.posts import Posts
-from app.models.telegram_user import TelegramUser
 
 
 class RepositoryPosts(RepositoryBase[Posts]):
