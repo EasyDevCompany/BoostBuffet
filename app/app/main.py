@@ -1,6 +1,7 @@
 from app.api.api_v1 import api
 from app.api import deps
 from app.api.api_v1.endpoints import webhook, posts, telegram_user
+from app.telegram_bot.handlers import moderator_commands
 from fastapi import FastAPI, Response
 from app.core.config import settings
 from app.core.containers import Container
@@ -11,7 +12,7 @@ from pathlib import Path
 
 def create_app():
     container = Container()
-    container.wire(modules=[deps, webhook, posts, telegram_user])
+    container.wire(modules=[deps, webhook, posts, telegram_user, moderator_commands])
     fastapi_app = FastAPI(
         title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json"
     )

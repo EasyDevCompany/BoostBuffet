@@ -30,3 +30,8 @@ class RepositoryPosts(RepositoryBase[Posts]):
                 self._model.author_id.in_(followings_ids),
                 self._model.status == Posts.PostStatus.published
             ).all()
+
+    def most_outdated_post(self,):
+        return self._session.query(
+            self._model
+            ).filter_by(status=Posts.PostStatus.draft).order_by(self._model.created_at.asc()).first()

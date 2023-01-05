@@ -43,25 +43,26 @@ class PostsService:
                     "path": post.get("path"),
                     "title": post.get("title"),
                     "content": post_in.content,
-                    "status": Posts.PostStatus.published,
+                    "status": Posts.PostStatus.draft,
                     "author": user,
                 }, commit=True)
 
             await bot.send_message(
                 user.telegram_id,
-                "Ваш пост опубликовали",
+                "Ваш пост создан",
                 parse_mode='HTML'
             )
-            message = await bot.send_message(
-                "-1001447940387",
-                f'<a href="{post.telegraph_url}">{post.title}</a>',
-                parse_mode='HTML'
-            )
-            await bot.forward_message(
-                chat_id=user.telegram_id,
-                from_chat_id=message.chat.id,
-                message_id=message.message_id
-            )
+            # ! Логика переотправления юзеру опубликованного поста
+            # message = await bot.send_message(
+            #     "-1001447940387",
+            #     f'<a href="{post.telegraph_url}">{post.title}</a>',
+            #     parse_mode='HTML'
+            # )
+            # await bot.forward_message(
+            #     chat_id=user.telegram_id,
+            #     from_chat_id=message.chat.id,
+            #     message_id=message.message_id
+            # )
 
         except TelegraphException as er:
             if str(er) == "TITLE_TOO_LONG":
@@ -94,7 +95,7 @@ class PostsService:
                 obj_in={
                     "title": post_in.title or post.title,
                     "content": post_in.content or post.content,
-                    "status": Posts.PostStatus.published
+                    "status": Posts.PostStatus.draft
                 }
             )
             await bot.send_message(
@@ -126,6 +127,7 @@ class PostsService:
     async def my_posts(self, user_id: str):
         representation = {
             "published": self._repository_posts.list(author_id=user_id, status=Posts.PostStatus.published),
+            "not_approved": self._repository_posts.list(author_id=user_id, status=Posts.PostStatus.not_approved),
             "draft": {
                 "posts": self._repository_posts.list(author_id=user_id, status=Posts.PostStatus.draft),
                 "draft_count": self._repository_posts.count_draft_posts(author_id=user_id)[0]
