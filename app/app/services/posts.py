@@ -49,20 +49,9 @@ class PostsService:
 
             await bot.send_message(
                 user.telegram_id,
-                "Ваш пост создан",
+                "Ваш пост отправлен на модерацию.",
                 parse_mode='HTML'
             )
-            # ! Логика переотправления юзеру опубликованного поста
-            # message = await bot.send_message(
-            #     "-1001447940387",
-            #     f'<a href="{post.telegraph_url}">{post.title}</a>',
-            #     parse_mode='HTML'
-            # )
-            # await bot.forward_message(
-            #     chat_id=user.telegram_id,
-            #     from_chat_id=message.chat.id,
-            #     message_id=message.message_id
-            # )
 
         except TelegraphException as er:
             if str(er) == "TITLE_TOO_LONG":

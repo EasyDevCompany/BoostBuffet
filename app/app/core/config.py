@@ -60,6 +60,7 @@ class Settings(BaseSettings):
 
     WEBAPP_URL: str
     SERVER_IP: str
+    CHANNEL_POSTS: str
 
     class Config:
         case_sensitive = True

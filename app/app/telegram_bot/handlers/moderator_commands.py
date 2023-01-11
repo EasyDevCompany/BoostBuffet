@@ -3,11 +3,14 @@ from uuid import uuid4
 
 from dependency_injector.wiring import inject, Provide
 
+from app.core.config import settings
+
 from app.telegram_bot.loader import bot, dp
 
 from app.core.containers import Container, TelegramUser, Posts
 from app.db.session import scope
 from app.telegram_bot.keyboards.moderator_keyboards import get_approve_buttons
+
 
 
 @dp.message_handler(commands=["to_approve"], state="*")
@@ -45,6 +48,21 @@ async def save_user(
         )
         await callback_query.message.delete()
         await callback_query.message.answer("Статус обновлён на опубликованный")
+        message = await bot.send_message(
+            settings.CHANNEL_POSTS,
+            f'<a href="{post.telegraph_url}">{post.title}</a>',
+            parse_mode='HTML'
+        )
+        await bot.send_message(
+            post.author.telegram_id,
+            'Ваш пост опубликован в канале',
+            parse_mode='HTML'
+        )
+        await bot.forward_message(
+            chat_id=post.author.telegram_id,
+            from_chat_id=message.chat.id,
+            message_id=message.message_id
+        )
     else:
         post = repository_posts.get(id=user_info[1])
         repository_posts.update(
@@ -55,3 +73,8 @@ async def save_user(
         )
         await callback_query.message.delete()
         await callback_query.message.answer("Статус обновлён на не одобренный")
+        await bot.send_message(
+            post.author.telegram_id,
+            f'Ваш пост {post.telegraph_url} не был одобрен модератором',
+            parse_mode='HTML'
+        )
