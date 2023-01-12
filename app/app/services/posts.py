@@ -134,6 +134,9 @@ class PostsService:
         }
         return representaion
 
+    async def three_last_posts(self,):
+        return self._repository_posts.three_last_posts()
+
     async def upload_image(
             self,
             user_id: str,
@@ -154,31 +157,3 @@ class PostsService:
             status_code=200,
             content={"img_url": f"{settings.SERVER_IP}/image/{user.telegram_id}/{image.filename}"}
         )
-
-    async def update_status(self, post_id: str, user_id: str, status: str):
-        user = self._repository_telegram_user.get(id=user_id)
-        if user.role != TelegramUser.UserRole.moderator:
-            return JSONResponse(status_code=403, content={"error": "У вас нет на это прав"})
-
-        post = self._repository_posts.get(id=post_id)
-        post = self._repository_posts.update(
-                db_obj=post,
-                obj_in={
-                    "status": status
-                }
-            )
-
-        if status == Posts.PostStatus.published:
-            await bot.send_message(
-                post.author.telegram_id,
-                f'Ваш пост <a href="{post.telegraph_url}">{post.title}</a> был опубликован',
-                parse_mode='HTML'
-            )
-            return JSONResponse(status_code=400, content={"error": "Новый статус: опубликован"})
-
-        await bot.send_message(
-            post.author.telegram_id,
-            f'Ваш пост <a href="{post.telegraph_url}">{post.title}</a> не прошел модерацию.',
-            parse_mode='HTML'
-        )
-        return JSONResponse(status_code=400, content={"error": "Новый статус: не прошёл модерацию."})

@@ -31,6 +31,11 @@ class RepositoryPosts(RepositoryBase[Posts]):
                 self._model.status == Posts.PostStatus.published
             ).all()
 
+    def three_last_posts(self,):
+        return self._session.query(
+            self._model
+            ).filter_by(status=Posts.PostStatus.published).order_by(self._model.likes_amount.desc()).order_by(self._model.created_at.desc()).all()[:3]
+
     def most_outdated_post(self,):
         return self._session.query(
             self._model

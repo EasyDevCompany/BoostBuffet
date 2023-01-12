@@ -92,16 +92,12 @@ async def all_types_posts(
     return await posts_service.all_types_posts(user_id=token)
 
 
-# @router.post("/update_status/{post_id}")
-# @inject
-# async def update_status(
-#         post_id: str,
-#         status: str,
-#         token = Depends(bot_token_verification),
-#         posts_service = Depends(Provide[Container.posts_service])):
-#     return await posts_service.update_status(
-#         user_id=token,
-#         post_id=post_id,
-#         status=status
-#     )
-
+@router.get("/three_last_posts")
+@inject
+async def three_last_posts(
+        token = Depends(bot_token_verification),
+        posts_service = Depends(Provide[Container.posts_service])):
+    """
+    Возвращает 3 поста для блока "есть что почитать".
+    """
+    return await posts_service.three_last_posts()
