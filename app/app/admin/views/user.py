@@ -7,6 +7,8 @@ class TelegramUserView(ModelView):
         "telegram_id",
         "telegraph_access_token",
         "username",
+        "first_name",
+        "surname",
         "registration_date",
         "type",
         "raiting",

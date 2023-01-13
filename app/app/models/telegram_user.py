@@ -44,6 +44,8 @@ class TelegramUser(Base):
 
     telegraph_access_token = Column(String)
     username = Column(String, nullable=True)
+    first_name = Column(String, nullable=True)
+    surname = Column(String, nullable=True)
     registration_date = Column(DateTime, default=datetime.datetime.utcnow)
     type = Column(Enum(UserType), default=UserType.active)
     role = Column(Enum(UserRole), default=UserRole.user)
@@ -60,5 +62,9 @@ class TelegramUser(Base):
 
     def __str__(self) -> str:
         return str(self.telegram_id) + " " + self.username if self.username else ""
+
+    @property
+    def username_link(self):
+        return f"@{self.username}"
 
 

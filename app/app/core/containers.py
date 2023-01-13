@@ -12,6 +12,7 @@ from app.repository.posts import Posts, RepositoryPosts
 
 from app.services.posts import PostsService
 from app.services.follow_relation import FollowService
+from app.services.telegram_user import TelegramUserService
 
 from app import redis
 
@@ -61,6 +62,10 @@ class Container(containers.DeclarativeContainer):
     repository_follow_relation = providers.Singleton(RepositoryFollowRelationship, model=FollowRelationship, session=db)
     repository_posts = providers.Singleton(RepositoryPosts, model=Posts, session=db)
 
+    telegram_user_service = providers.Singleton(
+        TelegramUserService,
+        repository_telegram_user=repository_telegram_user,
+    )
     posts_service = providers.Singleton(
         PostsService,
         repository_telegram_user=repository_telegram_user,
