@@ -1,3 +1,5 @@
+import requests
+
 from app.db.base_class import Base
 from sqlalchemy import (
     Column,
@@ -44,3 +46,10 @@ class Posts(Base):
     @property
     def views_amount(self):
         return get_views(self.path)
+
+    @property
+    def post_image(self):
+        req = requests.get(f"https://api.telegra.ph/getPage/{self.path}?return_content=true")
+        for tag in req.json().get("result").get("content"):
+            if isinstance(tag, dict) and tag.get("tag") == "img":
+                return tag.get("attrs").get("src")
