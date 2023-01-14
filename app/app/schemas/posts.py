@@ -4,8 +4,6 @@ from uuid import UUID
 
 from datetime import datetime
 
-from app.models.posts import Posts
-
 
 class PostIn(BaseModel):
     title: str
@@ -17,12 +15,16 @@ class PostIn(BaseModel):
 
 
 class DefaultPosts(BaseModel):
+    post_image: str
     telegraph_url: str
     title: str
     content: str
     created_at: datetime
     status: str
     author_id: UUID
+
+    class Config:
+        orm_mode = True
 
 class PublishedPosts(DefaultPosts):
     views_amount: int
@@ -33,9 +35,25 @@ class PublishedPosts(DefaultPosts):
 
 
 class DraftPosts(BaseModel):
-    # __root__ = Posts
-    posts: list[DefaultPosts]
+    posts: list[PublishedPosts]
     draft_count: int
+
+    class Config:
+        orm_mode = True
+
+
+class MyPosts(BaseModel):
+    published: list[DefaultPosts]
+    not_approved: list[DefaultPosts]
+    draft: DraftPosts
+    class Config:
+        orm_mode = True
+
+
+class AllPosts(BaseModel):
+    popular: list[DefaultPosts]
+    recent: list[DefaultPosts]
+    my_feed: list[DefaultPosts]
 
     class Config:
         orm_mode = True
