@@ -6,7 +6,7 @@ from typing import Optional
 
 from app.core.containers import Container
 from app.api.deps import bot_token_verification
-from app.schemas.posts import PublishedPosts, DraftPosts, DefaultPosts, PostIn
+from app.schemas.posts import PublishedPosts, PostIn, MyPosts, AllPosts
 
 
 router = APIRouter()
@@ -71,7 +71,7 @@ async def user_posts(
     )
 
 
-@router.get("/my_posts")
+@router.get("/my_posts", response_model=MyPosts)
 @inject
 async def my_posts(
         token = Depends(bot_token_verification),
@@ -81,7 +81,7 @@ async def my_posts(
     )
 
 
-@router.get("/all_types_posts")
+@router.get("/all_types_posts", response_model=AllPosts)
 @inject
 async def all_types_posts(
         token = Depends(bot_token_verification),
@@ -92,7 +92,7 @@ async def all_types_posts(
     return await posts_service.all_types_posts(user_id=token)
 
 
-@router.get("/three_last_posts")
+@router.get("/three_last_posts", response_model=list[PublishedPosts])
 @inject
 async def three_last_posts(
         token = Depends(bot_token_verification),
