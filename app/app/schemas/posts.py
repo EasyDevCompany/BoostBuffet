@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+from typing import Optional
 from uuid import UUID
 
 from datetime import datetime
@@ -15,7 +16,7 @@ class PostIn(BaseModel):
 
 
 class DefaultPosts(BaseModel):
-    post_image: str
+    post_image: Optional[str]
     telegraph_url: str
     title: str
     content: str
