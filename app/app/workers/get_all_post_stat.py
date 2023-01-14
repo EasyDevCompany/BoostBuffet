@@ -1,7 +1,7 @@
 from .base import Base
 from telethon import TelegramClient
 from loguru import logger
-
+from app.core.config import settings
 from app.repository.posts import RepositoryPosts
 
 
@@ -14,6 +14,7 @@ class AllPostTask(Base):
             api_hash: str,
             channel_url: str,
             repository_posts: RepositoryPosts,
+            *args, **kwargs
     ):
         self._repository_posts = repository_posts
         self._phone = phone
@@ -25,13 +26,16 @@ class AllPostTask(Base):
     def client(self):
         return TelegramClient(
             session=self.session_name,
-            api_id=self._api_id,
+            api_id=self._api_id[0],
             api_hash=self._api_hash
         )
 
+    def started_client(self):
+        return self.client().start(phone=self._phone)
+
     async def proccess(self, *args, **kwargs):
-        entity = await self.client().get_entity(self._channel_url)
-        posts = self.client().iter_messages(entity=entity)
+        entity = await self.started_client().get_entity(self._channel_url)
+        posts = self.started_client().iter_messages(entity=entity)
         for post in posts:
             logger.info(post.id)
             if post.reactions is not None:
@@ -42,4 +46,4 @@ class AllPostTask(Base):
 
     @property
     def session_name(self):
-        return f"{self._phone}_{self._api_id}"
+        return f"boost_{self._api_id}"
