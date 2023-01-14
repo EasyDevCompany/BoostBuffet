@@ -8,7 +8,6 @@ from telegraph.exceptions import TelegraphException
 
 from app.core.config import settings
 
-from app.models.telegram_user import TelegramUser
 from app.models.posts import Posts
 
 from app.repository.posts import RepositoryPosts, Posts
