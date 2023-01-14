@@ -14,6 +14,8 @@ from app.services.posts import PostsService
 from app.services.follow_relation import FollowService
 from app.services.telegram_user import TelegramUserService
 
+from app.workers.get_all_post_stat import AllPostTask
+
 from app import redis
 
 
@@ -80,6 +82,16 @@ class Container(containers.DeclarativeContainer):
     redis_pool = providers.Resource(
         redis.init_redis_pool,
         host=config.provided.REDIS_HOST
+    )
+
+    get_all_post_stat_task = CustomTaskProvider(
+        AllPostTask,
+        session=db,
+        phone=config.provided.PHONE,
+        api_id=config.provided.API_ID,
+        api_hash=config.provided.API_HASH,
+        channel_url=config.provided.CHANNEL_URL,
+        repository_posts=repository_posts
     )
 
 
