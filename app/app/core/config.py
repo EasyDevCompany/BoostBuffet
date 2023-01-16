@@ -61,6 +61,10 @@ class Settings(BaseSettings):
     WEBAPP_URL: str
     SERVER_IP: str
     CHANNEL_POSTS: str
+    PHONE: str
+    API_ID: int
+    API_HASH: str
+    CHANNEL_URL: str
 
     class Config:
         case_sensitive = True
