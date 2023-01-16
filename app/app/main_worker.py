@@ -5,6 +5,7 @@ from app.utils.rollbar import init_rollbar
 from app.core.celery import celery_app
 import rollbar
 
+
 container = CeleryContainer()
 container.wire(packages=[workers])
 container.init_resources()
@@ -20,4 +21,4 @@ def handle_task_failure(**kw):
 
 task_failure.connect(handle_task_failure)
 
-celery_app.add_periodic_task(10, container.get_all_post_stat_task.provided())
+celery_app.add_periodic_task(7200, container.get_all_post_stat_task.provided())
