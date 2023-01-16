@@ -50,7 +50,7 @@ async def save_user(
         await callback_query.message.answer("Статус обновлён на опубликованный")
         message = await bot.send_message(
             settings.CHANNEL_POSTS,
-            f'<a href="{post.telegraph_url}">{post.title}</a>',
+            f'<b>{post.title}</b> \n{post.subtitle} \nАвтор: @{post.author.username} \n{post.telegraph_url}',
             parse_mode='HTML'
         )
         await bot.send_message(

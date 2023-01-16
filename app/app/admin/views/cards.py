@@ -11,6 +11,7 @@ class CardsView(ModelView):
         "description",
         "first_tag",
         "second_tag",
+        "third_tag",
         "aprroval_status",
         "role",
         "profesion",

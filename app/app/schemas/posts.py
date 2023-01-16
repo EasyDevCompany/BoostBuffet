@@ -7,9 +7,9 @@ from datetime import datetime
 
 
 class PostIn(BaseModel):
-    title: str
-    subtitle: str
-    content: str
+    title: str = "title"
+    subtitle: str = "subtitle"
+    content: str = "content"
 
     class Config:
         orm_mode = True

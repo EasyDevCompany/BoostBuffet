@@ -48,6 +48,7 @@ class CardsService:
                 "description": card_in.description,
                 "first_tag": card_in.first_tag,
                 "second_tag": card_in.second_tag,
+                "third_tag": card_in.third_tag,
                 "author": user,
                 "chat_open": card_in.chat_available,
             },
@@ -58,8 +59,8 @@ class CardsService:
         return self._repository_cards.update(
             db_obj=card,
             obj_in={
-                "description": update_card_in.description,
-                "chat_open": update_card_in.chat_open
+                "description": update_card_in.description or card.description,
+                "chat_open": update_card_in.chat_open or card.chat_open
             }
         )
 
@@ -78,14 +79,14 @@ class CardsService:
 
         represantation = {"img_url": f"{settings.SERVER_IP}/image/{user.telegram_id}/{image.filename}"}
         return JSONResponse(status_code=200, content=represantation)
-
+# TODO Дописать логику если карты нет
     async def user_card(self, username):
         user = self._repository_telegram_user.get(username=username)
         return self._repository_cards.get(author_id=user.id)
 
     async def my_card(self, user_id):
         return self._repository_cards.get(author_id=user_id)
-
+# TODO Отправлять только юзерам у кого есть карточка
     async def send_message(self, username: str, text: str):
         user = self._repository_telegram_user.get(username=username)
         await bot.send_message(user.telegram_id, text=text)
@@ -104,3 +105,47 @@ class CardsService:
             }
         )
         return JSONResponse(content="Рейтинг был обновлён", status_code=200)
+
+    async def all_tags(self,):
+        tags = [
+            "Финтех",
+            "Дизайн",
+            "Adobe",
+            "Figma",
+            "Tilda",
+            "Java",
+            "Script",
+            "Python",
+            "СС",
+            "PHP",
+            "Google Analytics",
+            "Яндекс Метрика",
+            "Тайм-менеджмент"
+            "Переговоры",
+            "Лидерство",
+            "Менторство",
+            "Трекинг",
+            "ВШЭ",
+            "Плеханова",
+            "МГУ",
+            "МФТИ",
+            "МИФИ",
+            "РУДН",
+            "МГИМО",
+            "РАНХиГС",
+            "СПБГУ",
+            "СПБГТУ",
+            "НГУ",
+            "ННГУ",
+            "ТПУ",
+            "Project_Manager",
+            "Product Manager",
+            "Стартапер",
+            "Data Science",
+            "Маркетолог",
+            "Разработчик",
+            "Аналитик",
+            "Инженер",
+            "UX/UI"
+        ]
+        return JSONResponse(status_code=200, content=tags)
