@@ -6,13 +6,13 @@ from typing import Optional
 
 from app.core.containers import Container
 from app.api.deps import bot_token_verification
-from app.schemas.posts import PublishedPosts, PostIn, MyPosts, AllPosts
+from app.schemas.posts import PublishedPosts, PostIn, MyPosts, AllPosts, DefaultPosts
 
 
 router = APIRouter()
 
 
-@router.post("/create_post")
+@router.post("/create_post", response_model=DefaultPosts)
 @inject
 async def create_post(
         data: PostIn,
@@ -101,3 +101,12 @@ async def three_last_posts(
     Возвращает 3 поста для блока "есть что почитать".
     """
     return await posts_service.three_last_posts()
+
+
+@router.get("/draft_post", response_model=DefaultPosts)
+@inject
+async def get_draft_post(
+        post_id: str,
+        token = Depends(bot_token_verification),
+        posts_service = Depends(Provide[Container.posts_service])):
+    return await posts_service.get_draft_post(user_id=token, post_id=post_id)

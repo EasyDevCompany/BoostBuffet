@@ -16,6 +16,7 @@ class PostIn(BaseModel):
 
 
 class DefaultPosts(BaseModel):
+    id: UUID
     post_image: Optional[str]
     telegraph_url: str
     title: str

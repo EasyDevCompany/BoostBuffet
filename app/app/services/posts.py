@@ -59,7 +59,7 @@ class PostsService:
                 return JSONResponse(status_code=400, content={"error": "Неверный токен!"})
             return JSONResponse(status_code=400, content={"error": "Неизвестная ошибка, попробуйте еще раз."})
 
-        return f"Пост {post.telegraph_url} отправлен на модерацию"
+        return post
 
     async def edit_post(
             self,
@@ -156,3 +156,9 @@ class PostsService:
             status_code=200,
             content={"img_url": f"{settings.SERVER_IP}/image/{user.telegram_id}/{image.filename}"}
         )
+
+    async def get_draft_post(self, user_id: str, post_id: str):
+        post = self._repository_posts.get(id=post_id)
+        if post.author_id != user_id:
+            return JSONResponse(status_code=403, content="Это не ваша черновая статья.")
+        return post
