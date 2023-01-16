@@ -99,6 +99,7 @@ class Container(containers.DeclarativeContainer):
         api_id=config.provided.API_ID,
         api_hash=config.provided.API_HASH,
         channel_url=config.provided.CHANNEL_URL,
+        bot_token=config.provided.AUTH_BOT_TOKEN,
         repository_posts=repository_posts
     )
 
