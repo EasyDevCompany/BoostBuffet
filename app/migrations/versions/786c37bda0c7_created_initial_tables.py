@@ -1,8 +1,8 @@
 """created initial tables
 
-Revision ID: 8c87ecc172b6
+Revision ID: 786c37bda0c7
 Revises: 
-Create Date: 2023-01-04 23:38:11.204293
+Create Date: 2023-01-15 22:44:38.262596
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '8c87ecc172b6'
+revision = '786c37bda0c7'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,6 +23,8 @@ def upgrade():
     sa.Column('telegram_id', sa.BigInteger(), nullable=True),
     sa.Column('telegraph_access_token', sa.String(), nullable=True),
     sa.Column('username', sa.String(), nullable=True),
+    sa.Column('first_name', sa.String(), nullable=True),
+    sa.Column('surname', sa.String(), nullable=True),
     sa.Column('registration_date', sa.DateTime(), nullable=True),
     sa.Column('type', sa.Enum('active', 'blocked', name='usertype'), nullable=True),
     sa.Column('role', sa.Enum('user', 'moderator', name='userrole'), nullable=True),
@@ -32,6 +34,24 @@ def upgrade():
     )
     op.create_index(op.f('ix_telegramusers_id'), 'telegramusers', ['id'], unique=False)
     op.create_index(op.f('ix_telegramusers_telegram_id'), 'telegramusers', ['telegram_id'], unique=True)
+    op.create_table('cards',
+    sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
+    sa.Column('username', sa.String(), nullable=False),
+    sa.Column('first_name', sa.String(), nullable=True),
+    sa.Column('surname', sa.String(), nullable=True),
+    sa.Column('raiting', sa.Integer(), nullable=True),
+    sa.Column('description', sa.String(length=150), nullable=True),
+    sa.Column('aprroval_status', sa.Enum('approved', 'not_approved', 'draft', name='approvalstatus'), nullable=True),
+    sa.Column('role', sa.Enum('beginner', 'adept', 'master', 'sage', 'legend', name='cardrole'), nullable=True),
+    sa.Column('first_tag', sa.Enum('fintech', 'design', name='tag'), nullable=False),
+    sa.Column('second_tag', sa.Enum('fintech', 'design', name='tag'), nullable=False),
+    sa.Column('proffesion', sa.Enum('student', 'profesor', name='proffesion'), nullable=True),
+    sa.Column('chat_open', sa.Enum('available', 'not_available', name='chatopen'), nullable=True),
+    sa.Column('author_id', postgresql.UUID(as_uuid=True), nullable=True),
+    sa.ForeignKeyConstraint(['author_id'], ['telegramusers.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_cards_id'), 'cards', ['id'], unique=False)
     op.create_table('follow_relationship',
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('FollowerID', postgresql.UUID(as_uuid=True), nullable=False),
@@ -65,6 +85,8 @@ def downgrade():
     op.drop_table('posts')
     op.drop_index(op.f('ix_follow_relationship_id'), table_name='follow_relationship')
     op.drop_table('follow_relationship')
+    op.drop_index(op.f('ix_cards_id'), table_name='cards')
+    op.drop_table('cards')
     op.drop_index(op.f('ix_telegramusers_telegram_id'), table_name='telegramusers')
     op.drop_index(op.f('ix_telegramusers_id'), table_name='telegramusers')
     op.drop_table('telegramusers')

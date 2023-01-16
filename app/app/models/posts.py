@@ -48,6 +48,10 @@ class Posts(Base):
         return get_views(self.path)
 
     @property
+    def author_username(self):
+        return self.author.username_link
+
+    @property
     def post_image(self):
         req = requests.get(f"https://api.telegra.ph/getPage/{self.path}?return_content=true")
         for tag in req.json().get("result").get("content"):

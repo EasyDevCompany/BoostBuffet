@@ -14,6 +14,7 @@ class TelegramUserView(ModelView):
         "raiting",
         "likes_amount",
         "followings",
+        "role",
     ]
 
 

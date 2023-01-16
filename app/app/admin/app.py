@@ -9,9 +9,11 @@ from app.core.config import settings
 
 from app.models.telegram_user import TelegramUser, FollowRelationship
 from app.models.posts import Posts
+from app.models.cards import Cards
 
 from app.admin.views.user import TelegramUserView, FollowRelationView
 from app.admin.views.posts import PostsView
+from app.admin.views.cards import CardsView
 
 
 session = SyncSession(settings.SYNC_SQLALCHEMY_DATABASE_URI)
@@ -61,6 +63,7 @@ admin = Admin(secureApp, name='Admin', base_template='my_master.html', template_
 admin.add_view(TelegramUserView(TelegramUser, session.session))
 admin.add_view(FollowRelationView(FollowRelationship, session.session))
 admin.add_view(PostsView(Posts, session.session))
+admin.add_view(CardsView(Cards, session.session))
 # Add administrative views to Flask-Admin
 
 # Define the index route

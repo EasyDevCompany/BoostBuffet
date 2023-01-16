@@ -62,5 +62,7 @@ async def get_image_dir():
 async def download_profile_picture(tg_user_id: str, telegram_id: str):
     photo = await bot.get_user_profile_photos(tg_user_id)
     file_id = photo.photos[0][0].file_id
-    image_dir = await get_image_dir() / f"{telegram_id}" / "profile_picture.png"
-    await bot.download_file_by_id(file_id=file_id, destination=image_dir)
+    profile_image_dir = await get_image_dir() / f"{telegram_id}" / "profile_picture.png"
+    card_profile_image_dir = await get_image_dir() / f"{telegram_id}" / "card_image.png"
+    await bot.download_file_by_id(file_id=file_id, destination=profile_image_dir)
+    await bot.download_file_by_id(file_id=file_id, destination=card_profile_image_dir)

@@ -22,8 +22,7 @@ class DefaultPosts(BaseModel):
     content: str
     created_at: datetime
     status: str
-    author_id: UUID
-
+    author_username: str
     class Config:
         orm_mode = True
 

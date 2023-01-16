@@ -1,0 +1,106 @@
+from pathlib import Path
+
+from typing import Optional
+
+from fastapi.responses import JSONResponse
+
+from app.core.config import settings
+
+from app.repository.cards import RepositoryCards
+from app.repository.telegram_user import RepositoryTelegramUser
+
+from app.models.cards import Cards
+
+from app.telegram_bot.loader import bot
+
+from app.schemas.cards import CardIn, UpdateCardIn
+
+
+class CardsService:
+
+    def __init__(
+            self,
+            repository_cards: RepositoryCards,
+            repository_telegram_user: RepositoryTelegramUser,) -> None:
+
+        self._repository_cards = repository_cards
+        self._repository_telegram_user = repository_telegram_user
+
+    async def all_cards(
+            self,
+            first_tag: Optional[str],
+            second_tag: Optional[str]):
+        represantation = {
+            "cards": self._repository_cards.all_cards(first_tag=first_tag, second_tag=second_tag)
+        }
+        return represantation
+
+    async def create_card(self, user_id: str, card_in: CardIn):
+        user = self._repository_telegram_user.get(id=user_id)
+        card = self._repository_cards.get(author_id=user_id)
+        if card:
+            return JSONResponse(content={"error_msg": "У вас уже существует карточка"}, status_code=403)
+        return self._repository_cards.create(
+            obj_in={
+                "username": user.username,
+                "first_name": user.first_name,
+                "surname": user.surname,
+                "description": card_in.description,
+                "first_tag": card_in.first_tag,
+                "second_tag": card_in.second_tag,
+                "author": user,
+                "chat_open": card_in.chat_available,
+            },
+            commit=True)
+
+    async def update_card(self, update_card_in: UpdateCardIn, user_id: str):
+        card = self._repository_cards.get(author_id=user_id)
+        return self._repository_cards.update(
+            db_obj=card,
+            obj_in={
+                "description": update_card_in.description,
+                "chat_open": update_card_in.chat_open
+            }
+        )
+
+    async def upload_image(self, user_id, image):
+        user = self._repository_telegram_user.get(id=user_id)
+
+        current_file = Path(__file__)
+        current_file_dir = current_file.parent
+        project_root = current_file_dir.parent.parent / f"image/{user.telegram_id}"
+        project_root_absolute = project_root.resolve()
+        static_root_absolute = project_root_absolute / f"card_image.png"
+        file_location = static_root_absolute
+        with open(file_location, "wb+") as file_object:
+            image.filename = f"card_image.png"
+            file_object.write(image.file.read())
+
+        represantation = {"img_url": f"{settings.SERVER_IP}/image/{user.telegram_id}/{image.filename}"}
+        return JSONResponse(status_code=200, content=represantation)
+
+    async def user_card(self, username):
+        user = self._repository_telegram_user.get(username=username)
+        return self._repository_cards.get(author_id=user.id)
+
+    async def my_card(self, user_id):
+        return self._repository_cards.get(author_id=user_id)
+
+    async def send_message(self, username: str, text: str):
+        user = self._repository_telegram_user.get(username=username)
+        await bot.send_message(user.telegram_id, text=text)
+        return JSONResponse(content="Сообщение было отправлено", status_code=200)
+
+    async def add_raiting(self, user_id: str, moderator_id: str, raiting: int):
+        moderator_user = self._repository_telegram_user.get(id=moderator_id)
+        user = self._repository_telegram_user.get(telegram_id=user_id)
+        if moderator_user.role != "moderator":
+            return JSONResponse(content="У вас нет прав на обновление рейтинга", status_code=403)
+        card = self._repository_cards.get(author_id=user.id)
+        self._repository_cards.update(
+            db_obj=card,
+            obj_in={
+                "raiting": card.raiting + raiting
+            }
+        )
+        return JSONResponse(content="Рейтинг был обновлён", status_code=200)

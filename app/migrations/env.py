@@ -24,10 +24,12 @@ fileConfig(config.config_file_name)
 from app.db.base import Base  # noqa
 from app.models.telegram_user import TelegramUser
 from app.models.posts import Posts
+from app.models.cards import Cards
 from app.core.config import settings
 
 target_metadata = TelegramUser.metadata
 target_metadata = Posts.metadata
+target_metadata = Cards.metadata
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
