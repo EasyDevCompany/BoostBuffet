@@ -39,7 +39,7 @@ class AllPostTask(Base):
             if message.message is not None:
                 reaction_count = 0
                 comments_count = 0
-                post_url = message.message.split("\n")
+                post_url = message.message.split("\n")[-1]
 
                 if message.reactions is not None:
                     for reaction in message.reactions.results:
@@ -49,16 +49,18 @@ class AllPostTask(Base):
                     comments_count = message.replies.replies
 
                 post = self._repository_posts.get(telegraph_url=post_url[-1])
-                views = await self._get_post_views(post=post)
-                logger.info(f"Message: {post_url[-1]}\nReaction count: {reaction_count}\nComments count: {comments_count}")
-                self._repository_posts.update(
-                    obj_in={
-                        "likes_amount": reaction_count,
-                        "comments_count": comments_count,
-                        "views_count": views
-                    },
-                    db_obj=post
-                )
+                
+                if post is not None:
+                    views = await self._get_post_views(post=post)
+                    logger.info(f"Message: {post_url}\nReaction count: {reaction_count}\nComments count: {comments_count}")
+                    self._repository_posts.update(
+                        obj_in={
+                            "likes_amount": reaction_count,
+                            "comments_count": comments_count,
+                            "views_count": views
+                        },
+                        db_obj=post
+                    )
         await client.disconnect()
 
     async def _get_post_views(self, post):
