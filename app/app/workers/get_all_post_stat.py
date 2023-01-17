@@ -16,7 +16,7 @@ class AllPostTask(Base):
             channel_url: str,
             repository_posts: RepositoryPosts,
             *args, **kwargs
-    ):
+    ) -> None:
         self._repository_posts = repository_posts
         self._phone = phone
         self._api_id = api_id,
@@ -54,13 +54,14 @@ class AllPostTask(Base):
                     views = await self._get_post_views(post=post)
                     logger.info(f"Message: {post_url}\nReaction count: {reaction_count}\nComments count: {comments_count}")
                     self._repository_posts.update(
-                        obj_in={
-                            "likes_amount": reaction_count,
-                            "comments_count": comments_count,
-                            "views_count": views
-                        },
-                        db_obj=post
-                    )
+                            obj_in={
+                                "likes_amount": reaction_count,
+                                "comments_count": comments_count,
+                                "views_count": views
+                            },
+                            db_obj=post
+                        )
+        
         await client.disconnect()
 
     async def _get_post_views(self, post):
