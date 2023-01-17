@@ -6,6 +6,7 @@ from pydantic import BaseModel, root_validator
 class TagIn(BaseModel):
     first_tag: Optional[str] = "None"
     second_tag: Optional[str] = "None"
+    third_tag: Optional[str] = "None"
 
 
 class DefaultCard(BaseModel):
@@ -19,6 +20,7 @@ class DefaultCard(BaseModel):
     proffesion: str
     first_tag: str
     second_tag: str
+    third_tag: str
     chat_open: str
     card_profile_img: str
 
@@ -53,3 +55,4 @@ class UpdateCardIn(BaseModel):
     description: Optional[str]
     first_tag: Optional[str]
     second_tag: Optional[str]
+    third_tag: Optional[str]

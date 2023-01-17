@@ -9,16 +9,19 @@ from app.api.deps import bot_token_verification
 
 from app.schemas.cards import TagIn, CardsOut, CardIn, DefaultCard, UpdateCardIn
 
+from fastapi_pagination import Page
+
+
 
 router = APIRouter()
 
-@router.post("/all_cards", response_model=CardsOut)
+@router.post("/all_cards", response_model=Page[DefaultCard])
 @inject
 async def all_cards(
         tag_in: TagIn,
         token = Depends(bot_token_verification),
         cards_service = Depends(Provide[Container.cards_service]),):
-    return await cards_service.all_cards(first_tag=tag_in.first_tag, second_tag=tag_in.second_tag)
+    return await cards_service.all_cards(tag_in=tag_in)
 
 
 @router.post("/create_card", response_model=DefaultCard)
@@ -51,7 +54,7 @@ async def update_card(
     return await cards_service.update_card(update_card_in=update_card_in, user_id=token)
 
 
-@router.get("/user_card/{username}", response_model=DefaultCard)
+@router.get("/user_card/{username}", response_model=Optional[DefaultCard])
 @inject
 async def user_card(
         username: str,
@@ -60,7 +63,7 @@ async def user_card(
     return await cards_service.user_card(username=username)
 
 
-@router.get("/my_card", response_model=DefaultCard)
+@router.get("/my_card", response_model=Optional[DefaultCard])
 @inject
 async def my_card(
         token = Depends(bot_token_verification),
