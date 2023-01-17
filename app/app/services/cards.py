@@ -83,6 +83,8 @@ class CardsService:
 
     async def user_card(self, username):
         user = self._repository_telegram_user.get(username=username)
+        if not user:
+            return None
         return self._repository_cards.get(author_id=user.id)
 
     async def my_card(self, user_id):

@@ -54,7 +54,7 @@ async def update_card(
     return await cards_service.update_card(update_card_in=update_card_in, user_id=token)
 
 
-@router.get("/user_card/{username}", response_model=DefaultCard)
+@router.get("/user_card/{username}", response_model=Optional[DefaultCard])
 @inject
 async def user_card(
         username: str,
@@ -63,7 +63,7 @@ async def user_card(
     return await cards_service.user_card(username=username)
 
 
-@router.get("/my_card", response_model=DefaultCard)
+@router.get("/my_card", response_model=Optional[DefaultCard])
 @inject
 async def my_card(
         token = Depends(bot_token_verification),
