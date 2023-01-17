@@ -78,14 +78,14 @@ class CardsService:
 
         represantation = {"img_url": f"{settings.SERVER_IP}/image/{user.telegram_id}/{image.filename}"}
         return JSONResponse(status_code=200, content=represantation)
-
+# TODO Дописать логику если карты нет
     async def user_card(self, username):
         user = self._repository_telegram_user.get(username=username)
         return self._repository_cards.get(author_id=user.id)
 
     async def my_card(self, user_id):
         return self._repository_cards.get(author_id=user_id)
-
+# TODO Отправлять только юзерам у кого есть карточка
     async def send_message(self, username: str, text: str):
         user = self._repository_telegram_user.get(username=username)
         await bot.send_message(user.telegram_id, text=text)

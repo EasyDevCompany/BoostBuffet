@@ -20,4 +20,4 @@ def handle_task_failure(**kw):
 
 task_failure.connect(handle_task_failure)
 
-celery_app.add_periodic_task(10, container.get_all_post_stat_task.provided())
+# celery_app.add_periodic_task(10, container.get_all_post_stat_task.provided())

@@ -1,8 +1,8 @@
 """created initial tables
 
-Revision ID: 786c37bda0c7
+Revision ID: dbcd2493dc6a
 Revises: 
-Create Date: 2023-01-15 22:44:38.262596
+Create Date: 2023-01-17 00:25:04.621976
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '786c37bda0c7'
+revision = 'dbcd2493dc6a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -43,8 +43,8 @@ def upgrade():
     sa.Column('description', sa.String(length=150), nullable=True),
     sa.Column('aprroval_status', sa.Enum('approved', 'not_approved', 'draft', name='approvalstatus'), nullable=True),
     sa.Column('role', sa.Enum('beginner', 'adept', 'master', 'sage', 'legend', name='cardrole'), nullable=True),
-    sa.Column('first_tag', sa.Enum('fintech', 'design', name='tag'), nullable=False),
-    sa.Column('second_tag', sa.Enum('fintech', 'design', name='tag'), nullable=False),
+    sa.Column('first_tag', sa.Enum('fintech', 'design', 'adobe', 'figma', 'tilda', 'java', 'script', 'python', 'ci_plus_plus', 'php', 'google_analytics', 'yandex_metrics', 'time_menegment', 'conversation', 'leadership', 'mentoring', 'tracking', 'higher_school_of_economics', 'pleska', 'mgu', 'mfti', 'mifi', 'rudn', 'mgimo', 'ranhigs', 'spgu', 'spgtu', 'ngu', 'nngu', 'tpu', 'project_manager', 'product_manager', 'startup', 'data_science', 'smm', 'developer', 'analytic', 'engineer', 'ux_ui', name='tag'), nullable=False),
+    sa.Column('second_tag', sa.Enum('fintech', 'design', 'adobe', 'figma', 'tilda', 'java', 'script', 'python', 'ci_plus_plus', 'php', 'google_analytics', 'yandex_metrics', 'time_menegment', 'conversation', 'leadership', 'mentoring', 'tracking', 'higher_school_of_economics', 'pleska', 'mgu', 'mfti', 'mifi', 'rudn', 'mgimo', 'ranhigs', 'spgu', 'spgtu', 'ngu', 'nngu', 'tpu', 'project_manager', 'product_manager', 'startup', 'data_science', 'smm', 'developer', 'analytic', 'engineer', 'ux_ui', name='tag'), nullable=False),
     sa.Column('proffesion', sa.Enum('student', 'profesor', name='proffesion'), nullable=True),
     sa.Column('chat_open', sa.Enum('available', 'not_available', name='chatopen'), nullable=True),
     sa.Column('author_id', postgresql.UUID(as_uuid=True), nullable=True),
@@ -68,6 +68,7 @@ def upgrade():
     sa.Column('title', sa.String(), nullable=True),
     sa.Column('subtitle', sa.String(length=300), nullable=True),
     sa.Column('content', sa.String(), nullable=True),
+    sa.Column('views_count', sa.Integer(), nullable=True),
     sa.Column('status', sa.Enum('draft', 'published', 'not_approved', name='poststatus'), nullable=True),
     sa.Column('likes_amount', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),

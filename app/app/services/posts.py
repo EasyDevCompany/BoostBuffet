@@ -42,6 +42,7 @@ class PostsService:
                     "path": post.get("path"),
                     "title": post.get("title"),
                     "content": post_in.content,
+                    "subtitle": post_in.subtitle,
                     "status": Posts.PostStatus.draft,
                     "author": user,
                 }, commit=True)
@@ -88,7 +89,7 @@ class PostsService:
             )
             await bot.send_message(
                 user.telegram_id,
-                f'Вы отредактировали пост <a href="{post.telegraph_url}">{post.title}</a>',
+                f'Вы отредактировали пост <a href="{post.telegraph_url}">{post.title}</a> <b>{post.subtitle}</b>',
                 parse_mode='HTML'
             )
         except TelegraphException as er:
