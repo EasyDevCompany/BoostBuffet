@@ -1,7 +1,8 @@
+import requests
+
 from .base import Base
 from telethon import TelegramClient
 from loguru import logger
-from app.core.config import settings
 from app.repository.posts import RepositoryPosts
 
 
@@ -13,7 +14,6 @@ class AllPostTask(Base):
             api_id: int,
             api_hash: str,
             channel_url: str,
-            bot_token: str,
             repository_posts: RepositoryPosts,
             *args, **kwargs
     ):
@@ -22,29 +22,49 @@ class AllPostTask(Base):
         self._api_id = api_id,
         self._api_hash = api_hash
         self._channel_url = channel_url
-        self._bot_token = bot_token
         super().__init__(*args, **kwargs)
 
-    def client(self):
-        return TelegramClient(
+    async def client(self):
+        client = TelegramClient(
             session=self.session_name,
             api_id=self._api_id[0],
             api_hash=self._api_hash
-        ).start(phone=self._phone, bot_token=self._bot_token)
+        )
+        return await client.start(phone=self._phone)
 
     async def proccess(self, *args, **kwargs):
         client = await self.client()
         entity = await client.get_entity(self._channel_url)
-        posts = client.iter_messages(entity=entity)
-        # entity = await self.started_client().get_entity(self._channel_url)
-        # posts = self.started_client().iter_messages(entity=entity)
-        for post in posts:
-            logger.info(post.id)
-            if post.reactions is not None:
-                for reaction in post.reactions.results:
-                    logger.info(reaction.count)
-            if post.replies is not None:
-                logger.info(post.replies)
+        async for message in client.iter_messages(entity):
+            if message.message is not None:
+                reaction_count = 0
+                comments_count = 0
+                post_url = message.message.split("\n")
+
+                if message.reactions is not None:
+                    for reaction in message.reactions.results:
+                        reaction_count += reaction.count
+
+                if message.replies is not None:
+                    comments_count = message.replies.replies
+
+                post = self._repository_posts.get(telegraph_url=post_url[-1])
+                views = await self._get_post_views(post=post)
+                logger.info(f"Message: {post_url[-1]}\nReaction count: {reaction_count}\nComments count: {comments_count}")
+                self._repository_posts.update(
+                    obj_in={
+                        "likes_amount": reaction_count,
+                        "comments_count": comments_count,
+                        "views_count": views
+                    },
+                    db_obj=post
+                )
+        await client.disconnect()
+
+    async def _get_post_views(self, post):
+        url = f"https://api.telegra.ph/getViews/{post.path}?year=2022"
+        return requests.get(url).json().get("result").get("views")
+
 
     @property
     def session_name(self):

@@ -65,7 +65,6 @@ class Settings(BaseSettings):
     API_ID: int
     API_HASH: str
     CHANNEL_URL: str
-    AUTH_BOT_TOKEN: str
 
     class Config:
         case_sensitive = True
