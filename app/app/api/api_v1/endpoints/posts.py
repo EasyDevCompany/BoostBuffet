@@ -8,6 +8,8 @@ from app.core.containers import Container
 from app.api.deps import bot_token_verification
 from app.schemas.posts import PublishedPosts, PostIn, MyPosts, AllPosts, DefaultPosts
 
+from fastapi_pagination import Page
+
 
 router = APIRouter()
 
@@ -90,6 +92,30 @@ async def all_types_posts(
     Возвращает список постов из ленты.
     """
     return await posts_service.all_types_posts(user_id=token)
+
+
+@router.get("/popular_posts", response_model=Page[PublishedPosts])
+@inject
+async def popular_posts(
+        token = Depends(bot_token_verification),
+        posts_service = Depends(Provide[Container.posts_service])):
+    return await posts_service.popular_posts()
+
+
+@router.get("/recent_posts", response_model=Page[PublishedPosts])
+@inject
+async def recent_posts(
+        token = Depends(bot_token_verification),
+        posts_service = Depends(Provide[Container.posts_service])):
+    return await posts_service.recent_posts()
+
+
+@router.get("/my_feed", response_model=Page[PublishedPosts])
+@inject
+async def my_feed(
+        token = Depends(bot_token_verification),
+        posts_service = Depends(Provide[Container.posts_service])):
+    return await posts_service.my_feed(user_id=token)
 
 
 @router.get("/three_last_posts", response_model=list[PublishedPosts])

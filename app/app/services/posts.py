@@ -3,6 +3,8 @@ from random import randint
 
 from fastapi.responses import JSONResponse
 
+from fastapi_pagination.ext.sqlalchemy import paginate
+
 from telegraph import Telegraph
 from telegraph.exceptions import TelegraphException
 
@@ -128,11 +130,22 @@ class PostsService:
         followings = self._repository_telegram_user.get(id=user_id).followings
         followings_ids = [following.id for following in followings]
         representaion = {
-            "popular": self._repository_posts.most_popular(),
-            "recent": self._repository_posts.most_recent(),
-            "my_feed": self._repository_posts.feed(followings_ids=followings_ids)
+            "popular": self._repository_posts.most_popular().all(),
+            "recent": self._repository_posts.most_recent().all(),
+            "my_feed": self._repository_posts.feed(followings_ids=followings_ids).all()
         }
         return representaion
+
+    async def popular_posts(self,):
+        return paginate(self._repository_posts.most_popular())
+
+    async def recent_posts(self,):
+        return paginate(self._repository_posts.most_recent())
+
+    async def my_feed(self, user_id: str):
+        followings = self._repository_telegram_user.get(id=user_id).followings
+        followings_ids = [following.id for following in followings]
+        return paginate(self._repository_posts.feed(followings_ids=followings_ids))
 
     async def three_last_posts(self,):
         return self._repository_posts.three_last_posts()
