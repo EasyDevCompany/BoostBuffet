@@ -29,8 +29,8 @@ from app.core.config import settings
 
 target_metadata = TelegramUser.metadata
 target_metadata = Posts.metadata
-target_metadata = Cards.metadata
 target_metadata = Base.metadata
+target_metadata = Cards.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

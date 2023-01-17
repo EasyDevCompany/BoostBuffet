@@ -68,6 +68,14 @@ async def my_card(
     return await cards_service.my_card(user_id=token)
 
 
+@router.get("/tags")
+@inject
+async def tags(
+        token = Depends(bot_token_verification),
+        cards_service = Depends(Provide[Container.cards_service]),):
+    return await cards_service.all_tags()
+
+
 @router.post("/send_message")
 @inject
 async def send_message(

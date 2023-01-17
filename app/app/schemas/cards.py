@@ -37,16 +37,19 @@ class CardIn(BaseModel):
     description: str
     first_tag: str
     second_tag: str
+    third_tag: str
     chat_available: str = "available"
 
     @root_validator
     @classmethod
     def validate_tags_not_equal(cls, field_value):
-        if field_value["first_tag"] == field_value["second_tag"]:
+        if len(set((field_value["first_tag"], field_value["second_tag"], field_value["third_tag"]))) <3:
             raise ValueError("Вы не можете выбрать одинаковые тэги")
         return field_value
 
 
 class UpdateCardIn(BaseModel):
-    chat_open: str
-    description: str
+    chat_open: Optional[str]
+    description: Optional[str]
+    first_tag: Optional[str]
+    second_tag: Optional[str]

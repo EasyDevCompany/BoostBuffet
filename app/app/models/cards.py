@@ -93,6 +93,7 @@ class Cards(Base):
     role = Column(Enum(CardRole), default=CardRole.beginner)
     first_tag = Column(Enum(Tag), nullable=False)
     second_tag = Column(Enum(Tag), nullable=False)
+    third_tag = Column(Enum(Tag), nullable=False)
     proffesion = Column(Enum(Proffesion), default=Proffesion.student)
     chat_open = Column(Enum(ChatOpen), default=ChatOpen.available)
 
