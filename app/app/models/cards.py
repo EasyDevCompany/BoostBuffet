@@ -88,6 +88,7 @@ class Cards(Base):
     surname = Column(String, nullable=True)
     raiting = Column(Integer, default=0)
     description = Column(String(150), nullable=True)
+    bio = Column(String(1000), nullable=True)
 
     aprroval_status = Column(Enum(ApprovalStatus), default=ApprovalStatus.draft)
     role = Column(Enum(CardRole), default=CardRole.beginner)

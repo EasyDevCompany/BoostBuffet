@@ -39,7 +39,8 @@ class CardsOut(BaseModel):
 
 
 class CardIn(BaseModel):
-    description: str
+    description: Optional[str] = "Null"
+    bio: Optional[str] = "Null"
     first_tag: str
     second_tag: str
     third_tag: str
@@ -56,6 +57,7 @@ class CardIn(BaseModel):
 class UpdateCardIn(BaseModel):
     chat_open: Optional[str]
     description: Optional[str]
+    bio: Optional[str]
     first_tag: Optional[str]
     second_tag: Optional[str]
     third_tag: Optional[str]

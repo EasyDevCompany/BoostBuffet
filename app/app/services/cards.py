@@ -37,12 +37,15 @@ class CardsService:
         card = self._repository_cards.get(author_id=user_id)
         if card:
             return JSONResponse(content={"error_msg": "У вас уже существует карточка"}, status_code=403)
+        if not user.username:
+            return JSONResponse(content={"error_msg": "У вас отсутствует username"}, status_code=403)
         return self._repository_cards.create(
             obj_in={
                 "username": user.username,
                 "first_name": user.first_name,
                 "surname": user.surname,
-                "description": card_in.description,
+                "description": card_in.description or user.description,
+                "bio": card_in.bio,
                 "first_tag": card_in.first_tag,
                 "second_tag": card_in.second_tag,
                 "third_tag": card_in.third_tag,
@@ -58,6 +61,7 @@ class CardsService:
             db_obj=card,
             obj_in={
                 "description": update_card_in.description or card.description,
+                "bio": update_card_in.bio or card.bio,
                 "chat_open": update_card_in.chat_open or card.chat_open,
                 "first_tag": update_card_in.first_tag or card.first_tag,
                 "second_tag": update_card_in.second_tag or card.second_tag,
