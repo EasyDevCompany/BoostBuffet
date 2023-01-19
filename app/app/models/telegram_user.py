@@ -46,6 +46,7 @@ class TelegramUser(Base):
     username = Column(String, nullable=True)
     first_name = Column(String, nullable=True)
     surname = Column(String, nullable=True)
+    description = Column(String, nullable=True)
     registration_date = Column(DateTime, default=datetime.datetime.utcnow)
     type = Column(Enum(UserType), default=UserType.active)
     role = Column(Enum(UserRole), default=UserRole.user)

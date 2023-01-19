@@ -9,6 +9,7 @@ class TelegramUserView(ModelView):
         "username",
         "first_name",
         "surname",
+        "description",
         "registration_date",
         "type",
         "raiting",

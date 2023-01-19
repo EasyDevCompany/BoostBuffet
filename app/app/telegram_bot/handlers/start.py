@@ -26,12 +26,14 @@ async def process_start_command(
     await download_profile_picture(tg_user_id=message.from_user.id, telegram_id=message.from_user.id)
     if not user:
         res = Container.telegraph.create_account(short_name=message.from_user.username)
+        user_info = await bot.get_chat(message.from_user.id)
         user = rep_telegram_user.create(
             obj_in={
                 "telegram_id": message.from_user.id,
                 "username": message.from_user.username,
                 "first_name": message.from_user.first_name,
                 "surname": message.from_user.last_name,
+                "description": user_info.bio,
                 "telegraph_access_token": res.get("access_token"),
                 "type": TelegramUser.UserType.active,
                 "raiting": 0
