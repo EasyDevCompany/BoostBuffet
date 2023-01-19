@@ -2,6 +2,8 @@ from typing import Optional
 
 from pydantic import BaseModel, root_validator
 
+from uuid import UUID
+
 
 class TagIn(BaseModel):
     first_tag: Optional[str] = "None"
@@ -10,6 +12,7 @@ class TagIn(BaseModel):
 
 
 class DefaultCard(BaseModel):
+    id: UUID
     author_username: str
     first_name: Optional[str]
     surname: Optional[str]
