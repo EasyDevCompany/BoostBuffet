@@ -130,3 +130,8 @@ class RepositoryCards(RepositoryBase[Cards]):
             ).filter_by(
                 aprroval_status=Cards.ApprovalStatus.approved
                 ).order_by(self._model.raiting.desc()).all()[:3]
+
+    def most_outdated_card(self,):
+        return self._session.query(
+            self._model
+            ).filter_by(aprroval_status=Cards.ApprovalStatus.draft).first()
