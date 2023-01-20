@@ -123,3 +123,10 @@ class RepositoryCards(RepositoryBase[Cards]):
             )
         # 000
         return query
+    
+    def three_last_cards(self,):
+        return self._session.query(
+            self._model
+            ).filter_by(
+                aprroval_status=Cards.ApprovalStatus.approved
+                ).order_by(self._model.raiting.desc()).all()[:3]

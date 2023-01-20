@@ -106,7 +106,7 @@ class Cards(Base):
 
     @property
     def card_profile_img(self):
-        return f"{settings.SERVER_IP}/image/{self.author.telegram_id}/card_image.png"
+        return f"/image/{self.author.telegram_id}/card_image.png"
 
     @property
     def author_username(self):

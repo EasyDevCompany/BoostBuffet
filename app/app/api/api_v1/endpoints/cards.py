@@ -71,6 +71,14 @@ async def my_card(
     return await cards_service.my_card(user_id=token)
 
 
+@router.get("/three_last_cards", response_model=list[DefaultCard])
+@inject
+async def three_last_cards(
+        token = Depends(bot_token_verification),
+        cards_service = Depends(Provide[Container.cards_service]),):
+    return await cards_service.three_last_cards()
+
+
 @router.get("/tags")
 @inject
 async def tags(

@@ -107,6 +107,9 @@ class CardsService:
     async def my_card(self, user_id):
         return self._repository_cards.get(author_id=user_id)
 
+    async def three_last_cards(self):
+        return self._repository_cards.three_last_cards()
+
     async def send_message(self, username: str, text: str):
         user = self._repository_telegram_user.get(username=username)
         await bot.send_message(user.telegram_id, text=text)
