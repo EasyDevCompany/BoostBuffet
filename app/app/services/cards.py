@@ -58,15 +58,27 @@ class CardsService:
 
     async def update_card(self, update_card_in: UpdateCardIn, user_id: str):
         card = self._repository_cards.get(author_id=user_id)
+        if update_card_in.first_tag == "Null":
+            first_tag = None
+        else:
+            first_tag = card.first_tag
+        if update_card_in.second_tag == "Null":
+            second_tag = None
+        else:
+            second_tag = card.second_tag
+        if update_card_in.third_tag == "Null":
+            third_tag = None
+        else:
+            second_tag = card.second_tag
         return self._repository_cards.update(
             db_obj=card,
             obj_in={
                 "description": update_card_in.description or card.description,
                 "bio": update_card_in.bio or card.bio,
                 "chat_open": update_card_in.chat_open or card.chat_open,
-                "first_tag": update_card_in.first_tag or card.first_tag,
-                "second_tag": update_card_in.second_tag or card.second_tag,
-                "third_tag": update_card_in.third_tag or card.third_tag
+                "first_tag": first_tag,
+                "second_tag": second_tag,
+                "third_tag": third_tag
             }
         )
 
