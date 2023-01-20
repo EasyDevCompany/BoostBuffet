@@ -168,7 +168,7 @@ class PostsService:
             file_object.write(image.file.read())
         return JSONResponse(
             status_code=200,
-            content={"img_url": f"{settings.SERVER_IP}/image/{user.telegram_id}/{image.filename}"}
+            content={"img_path": f"/image/{user.telegram_id}/{image.filename}"}
         )
 
     async def get_draft_post(self, user_id: str, post_id: str):

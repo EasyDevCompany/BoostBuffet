@@ -82,7 +82,7 @@ class CardsService:
             image.filename = f"card_image.png"
             file_object.write(image.file.read())
 
-        represantation = {"img_url": f"{settings.SERVER_IP}/image/{user.telegram_id}/{image.filename}"}
+        represantation = {"img_path": f"/image/{user.telegram_id}/{image.filename}"}
         return JSONResponse(status_code=200, content=represantation)
 
     async def user_card(self, username):
