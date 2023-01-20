@@ -37,6 +37,7 @@ class CardsService:
         card = self._repository_cards.get(author_id=user_id)
         if card:
             return JSONResponse(content={"error_msg": "У вас уже существует карточка"}, status_code=403)
+        print(user.username)
         if not user.username:
             return JSONResponse(content={"error_msg": "У вас отсутствует username"}, status_code=403)
         return self._repository_cards.create(

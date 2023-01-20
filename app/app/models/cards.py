@@ -92,9 +92,9 @@ class Cards(Base):
 
     aprroval_status = Column(Enum(ApprovalStatus), default=ApprovalStatus.draft)
     role = Column(Enum(CardRole), default=CardRole.beginner)
-    first_tag = Column(Enum(Tag), nullable=False)
-    second_tag = Column(Enum(Tag), nullable=False)
-    third_tag = Column(Enum(Tag), nullable=False)
+    first_tag = Column(Enum(Tag), nullable=True)
+    second_tag = Column(Enum(Tag), nullable=True)
+    third_tag = Column(Enum(Tag), nullable=True)
     proffesion = Column(Enum(Proffesion), default=Proffesion.student)
     chat_open = Column(Enum(ChatOpen), default=ChatOpen.available)
 
