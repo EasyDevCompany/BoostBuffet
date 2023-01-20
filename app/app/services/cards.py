@@ -69,7 +69,7 @@ class CardsService:
         if update_card_in.third_tag == "Null":
             third_tag = None
         else:
-            second_tag = card.second_tag
+            third_tag = card.third_tag
         return self._repository_cards.update(
             db_obj=card,
             obj_in={
