@@ -96,8 +96,7 @@ async def process_start_command(
     if user and user.role == TelegramUser.UserRole.moderator:
         most_outdated_card = reposotory_cards.most_outdated_card()
         if most_outdated_card:
-            # ! Здесь логика на ссылку с отправлением карточки
-            await message.answer(most_outdated_card.author.username, reply_markup=get_card_approve_buttons(card_id=most_outdated_card.id))
+            await message.answer(f"{settings.WEBAPP_URL}networking/{most_outdated_card.username}", reply_markup=get_card_approve_buttons(card_id=most_outdated_card.id))
         else:
             await message.answer("Все карты проверены")
     else:
