@@ -10,11 +10,13 @@ from app.db.session import SyncSession
 from app.repository.telegram_user import TelegramUser, FollowRelationship, RepositoryTelegramUser, RepositoryFollowRelationship
 from app.repository.posts import Posts, RepositoryPosts
 from app.repository.cards import RepositoryCards, Cards
+from app.repository.moove_posts import RepositoryMoovePosts, MoovePosts
 
 from app.services.posts import PostsService
 from app.services.follow_relation import FollowService
 from app.services.telegram_user import TelegramUserService
 from app.services.cards import CardsService
+from app.services.moove_posts import MoovePostsService
 
 from app.workers.get_all_post_stat import AllPostTask
 
@@ -66,6 +68,7 @@ class Container(containers.DeclarativeContainer):
     repository_follow_relation = providers.Singleton(RepositoryFollowRelationship, model=FollowRelationship, session=db)
     repository_posts = providers.Singleton(RepositoryPosts, model=Posts, session=db)
     reposotory_cards = providers.Singleton(RepositoryCards, model=Cards, session=db)
+    reposotory_moove_posts = providers.Singleton(RepositoryMoovePosts, model=MoovePosts, session=db)
 
     telegram_user_service = providers.Singleton(
         TelegramUserService,
@@ -85,6 +88,10 @@ class Container(containers.DeclarativeContainer):
         CardsService,
         repository_cards=reposotory_cards,
         repository_telegram_user=repository_telegram_user
+    )
+    moove_posts_service = providers.Singleton(
+        MoovePostsService,
+        moove_posts_repository=reposotory_moove_posts
     )
 
     redis_pool = providers.Resource(
