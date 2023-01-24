@@ -44,7 +44,7 @@ class PostsService:
                     "path": post.get("path"),
                     "title": post.get("title"),
                     "content": post_in.content,
-                    "subtitle": post_in.subtitle,
+                    "subtitle": post_in.subtitle or None,
                     "status": Posts.PostStatus.draft,
                     "author": user,
                 }, commit=True)
