@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi_pagination.ext.sqlalchemy import paginate
 
 from app.repository.moove_posts import RepositoryMoovePosts
+from app.repository.telegram_user import RepositoryTelegramUser
 
 
 
@@ -13,11 +14,16 @@ class MoovePostsService:
 
     def __init__(
             self,
+            repository_telegram_user: RepositoryTelegramUser,
             moove_posts_repository: RepositoryMoovePosts) -> None:
 
         self._moove_posts_repository = moove_posts_repository
+        self._repository_telegram_user = repository_telegram_user
 
-    async def upload_post_url(self, url: str, category: str):
+    async def upload_post_url(self, url: str, category: str, user_id: str):
+        user = self._repository_telegram_user.get(id=user_id)
+        if user.role != "moderator":
+            return JSONResponse(content={"error_msg": "У вас недостаточно прав"}, status_code=403)
         response = requests.get(url)
         response.encoding = "utf-8"
         soup = BeautifulSoup(response.text, "lxml")

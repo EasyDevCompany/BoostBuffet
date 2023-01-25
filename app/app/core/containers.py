@@ -91,6 +91,7 @@ class Container(containers.DeclarativeContainer):
     )
     moove_posts_service = providers.Singleton(
         MoovePostsService,
+        repository_telegram_user=repository_telegram_user,
         moove_posts_repository=reposotory_moove_posts
     )
 

@@ -19,7 +19,7 @@ async def upload_moove_post(
         category: str,
         token = Depends(bot_token_verification),
         moove_service = Depends(Provide[Container.moove_posts_service])):
-    return await moove_service.upload_post_url(url, category)
+    return await moove_service.upload_post_url(url, category, user_id=token)
 
 
 @router.post("/all_moove_posts", response_model=Page[MoovePost])
