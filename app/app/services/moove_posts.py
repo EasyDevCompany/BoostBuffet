@@ -32,7 +32,7 @@ class MoovePostsService:
         for meta_tag in metas:
             if meta_tag.get("property") == "og:image":
                 image_url = meta_tag.get("content").strip()
-            elif meta_tag.get("property") == "og:description":
+            elif meta_tag.get("property") == "og:description" or meta_tag.get("name") == "og:description":
                 snippet = meta_tag.get("content").strip()
             elif meta_tag.get("property") == "og:title" or meta_tag.get("name") == "og:title":
                 title = meta_tag.get("content").strip()
