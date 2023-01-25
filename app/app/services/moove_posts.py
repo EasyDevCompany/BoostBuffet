@@ -34,7 +34,7 @@ class MoovePostsService:
                 image_url = meta_tag.get("content").strip()
             elif meta_tag.get("property") == "og:description":
                 snippet = meta_tag.get("content").strip()
-            elif meta_tag.get("property") == "og:title":
+            elif meta_tag.get("property") == "og:title" or meta_tag.get("name") == "og:title":
                 title = meta_tag.get("content").strip()
 
         return self._moove_posts_repository.create(
