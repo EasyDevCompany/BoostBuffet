@@ -1,8 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
-from app.repository.moove_posts import RepositoryMoovePosts
 
 from fastapi.responses import JSONResponse
+from fastapi_pagination.ext.sqlalchemy import paginate
+
+from app.repository.moove_posts import RepositoryMoovePosts
+
 
 
 
@@ -38,8 +41,8 @@ class MoovePostsService:
             }, commit=True
         )
 
-    async def all_posts(self):
-        return self._moove_posts_repository.list()
+    async def all_posts(self, category: str):
+        return paginate(self._moove_posts_repository.filter_category(category=category))
 
     async def all_cateogories(self):
         categories = ["Питчинг", "Лекции", "Стартапы выпускников", "Читать буквы"]
