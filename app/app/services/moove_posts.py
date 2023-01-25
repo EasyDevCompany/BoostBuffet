@@ -48,6 +48,8 @@ class MoovePostsService:
         )
 
     async def all_posts(self, category: str):
+        if not category:
+            return paginate(self._moove_posts_repository.all_posts())
         return paginate(self._moove_posts_repository.filter_category(category=category))
 
     async def all_cateogories(self):

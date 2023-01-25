@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends
 from fastapi_pagination import Page
 
@@ -22,11 +24,11 @@ async def upload_moove_post(
     return await moove_service.upload_post_url(url, category, user_id=token)
 
 
-@router.post("/all_moove_posts", response_model=Page[MoovePost])
+@router.get("/all_moove_posts", response_model=Page[MoovePost])
 @inject
 @commit_and_close_session
 async def all_moove_posts(
-        category: str,
+        category: Optional[str] = None,
         token = Depends(bot_token_verification),
         moove_service = Depends(Provide[Container.moove_posts_service])):
     return await moove_service.all_posts(category=category)
