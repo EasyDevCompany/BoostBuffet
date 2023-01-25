@@ -51,7 +51,7 @@ class CardsService:
                 "third_tag": card_in.third_tag,
                 "author": user,
                 "chat_open": card_in.chat_available,
-                "aprroval_status": "approved",
+                "aprroval_status": "not_approved",
             },
             commit=True)
 
