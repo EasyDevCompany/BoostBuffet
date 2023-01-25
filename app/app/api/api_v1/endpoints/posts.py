@@ -5,7 +5,7 @@ from dependency_injector.wiring import inject, Provide
 from typing import Optional
 
 from app.core.containers import Container
-from app.api.deps import bot_token_verification
+from app.api.deps import bot_token_verification, commit_and_close_session
 from app.schemas.posts import PublishedPosts, PostIn, MyPosts, AllPosts, DefaultPosts
 
 from fastapi_pagination import Page
@@ -16,6 +16,7 @@ router = APIRouter()
 
 @router.post("/create_post", response_model=DefaultPosts)
 @inject
+@commit_and_close_session
 async def create_post(
         data: PostIn,
         token = Depends(bot_token_verification),
@@ -28,6 +29,7 @@ async def create_post(
 
 @router.post('/upload_image')
 @inject
+@commit_and_close_session
 async def upload_image(
         image: UploadFile = File(...),
         token = Depends(bot_token_verification),
@@ -40,6 +42,7 @@ async def upload_image(
 
 @router.post("/edit_post")
 @inject
+@commit_and_close_session
 async def edit_post(
         post_url: str,
         data: PostIn,
@@ -53,6 +56,7 @@ async def edit_post(
 
 @router.post("/delete_post")
 @inject
+@commit_and_close_session
 async def delete_post(
         post_url: str,
         token = Depends(bot_token_verification),
@@ -64,6 +68,7 @@ async def delete_post(
 
 @router.get("/user_posts/{user_id}", response_model=list[PublishedPosts])
 @inject
+@commit_and_close_session
 async def user_posts(
         user_id: str,
         token = Depends(bot_token_verification),
@@ -75,6 +80,7 @@ async def user_posts(
 
 @router.get("/my_posts", response_model=MyPosts)
 @inject
+@commit_and_close_session
 async def my_posts(
         token = Depends(bot_token_verification),
         posts_service = Depends(Provide[Container.posts_service])):
@@ -85,6 +91,7 @@ async def my_posts(
 
 @router.get("/all_types_posts", response_model=AllPosts)
 @inject
+@commit_and_close_session
 async def all_types_posts(
         token = Depends(bot_token_verification),
         posts_service = Depends(Provide[Container.posts_service])):
@@ -96,6 +103,7 @@ async def all_types_posts(
 
 @router.get("/popular_posts", response_model=Page[PublishedPosts])
 @inject
+@commit_and_close_session
 async def popular_posts(
         token = Depends(bot_token_verification),
         posts_service = Depends(Provide[Container.posts_service])):
@@ -104,6 +112,7 @@ async def popular_posts(
 
 @router.get("/recent_posts", response_model=Page[PublishedPosts])
 @inject
+@commit_and_close_session
 async def recent_posts(
         token = Depends(bot_token_verification),
         posts_service = Depends(Provide[Container.posts_service])):
@@ -112,6 +121,7 @@ async def recent_posts(
 
 @router.get("/my_feed", response_model=Page[PublishedPosts])
 @inject
+@commit_and_close_session
 async def my_feed(
         token = Depends(bot_token_verification),
         posts_service = Depends(Provide[Container.posts_service])):
@@ -120,6 +130,7 @@ async def my_feed(
 
 @router.get("/three_last_posts", response_model=list[PublishedPosts])
 @inject
+@commit_and_close_session
 async def three_last_posts(
         token = Depends(bot_token_verification),
         posts_service = Depends(Provide[Container.posts_service])):
@@ -131,6 +142,7 @@ async def three_last_posts(
 
 @router.get("/draft_post", response_model=DefaultPosts)
 @inject
+@commit_and_close_session
 async def get_draft_post(
         post_id: str,
         token = Depends(bot_token_verification),

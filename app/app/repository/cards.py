@@ -100,7 +100,7 @@ class RepositoryCards(RepositoryBase[Cards]):
                 or_(
                     self._model.first_tag.in_((tag_in.first_tag , tag_in.second_tag)),
                     self._model.second_tag.in_((tag_in.first_tag, tag_in.second_tag)),
-                    self._model.third.in_((tag_in.first_tag, tag_in.second_tag)),
+                    self._model.third_tag.in_((tag_in.first_tag, tag_in.second_tag)),
                 )
             )
         # 101

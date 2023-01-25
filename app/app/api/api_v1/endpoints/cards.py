@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, UploadFile, File
 from dependency_injector.wiring import inject, Provide
 
 from app.core.containers import Container
-from app.api.deps import bot_token_verification
+from app.api.deps import bot_token_verification, commit_and_close_session
 
 from app.schemas.cards import TagIn, CardsOut, CardIn, DefaultCard, UpdateCardIn
 
@@ -17,6 +17,7 @@ router = APIRouter()
 
 @router.post("/all_cards", response_model=Page[DefaultCard])
 @inject
+@commit_and_close_session
 async def all_cards(
         tag_in: TagIn,
         token = Depends(bot_token_verification),
@@ -26,6 +27,7 @@ async def all_cards(
 
 @router.post("/create_card", response_model=DefaultCard)
 @inject
+@commit_and_close_session
 async def create_card(
         card_in: CardIn,
         token = Depends(bot_token_verification),
@@ -35,6 +37,7 @@ async def create_card(
 
 @router.post('/upload_image')
 @inject
+@commit_and_close_session
 async def upload_image(
         image: UploadFile = File(...),
         token = Depends(bot_token_verification),
@@ -47,6 +50,7 @@ async def upload_image(
 
 @router.post("/update_card")
 @inject
+@commit_and_close_session
 async def update_card(
         update_card_in: UpdateCardIn,
         token = Depends(bot_token_verification),
@@ -56,6 +60,7 @@ async def update_card(
 
 @router.get("/user_card/{username}", response_model=Optional[DefaultCard])
 @inject
+@commit_and_close_session
 async def user_card(
         username: str,
         token = Depends(bot_token_verification),
@@ -65,6 +70,7 @@ async def user_card(
 
 @router.get("/my_card", response_model=Optional[DefaultCard])
 @inject
+@commit_and_close_session
 async def my_card(
         token = Depends(bot_token_verification),
         cards_service = Depends(Provide[Container.cards_service]),):
@@ -73,6 +79,7 @@ async def my_card(
 
 @router.get("/three_last_cards", response_model=list[DefaultCard])
 @inject
+@commit_and_close_session
 async def three_last_cards(
         token = Depends(bot_token_verification),
         cards_service = Depends(Provide[Container.cards_service]),):
@@ -81,6 +88,7 @@ async def three_last_cards(
 
 @router.get("/tags")
 @inject
+@commit_and_close_session
 async def tags(
         token = Depends(bot_token_verification),
         cards_service = Depends(Provide[Container.cards_service]),):
@@ -89,6 +97,7 @@ async def tags(
 
 @router.post("/send_message")
 @inject
+@commit_and_close_session
 async def send_message(
         username: str,
         text: str,
@@ -99,6 +108,7 @@ async def send_message(
 
 @router.post("/add_raiting")
 @inject
+@commit_and_close_session
 async def add_raiting(
         raiting: int,
         user_id: str,
