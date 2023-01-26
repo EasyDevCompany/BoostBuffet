@@ -16,6 +16,8 @@ from app.telegram_bot.loader import bot
 from app.schemas.cards import CardIn, UpdateCardIn, TagIn
 from fastapi_pagination.ext.sqlalchemy import paginate
 
+from app.logs.logger_config import catch_logs
+
 class CardsService:
 
     def __init__(
@@ -26,12 +28,14 @@ class CardsService:
         self._repository_cards = repository_cards
         self._repository_telegram_user = repository_telegram_user
 
+    @catch_logs
     async def all_cards(
             self,
             tag_in: TagIn):
 
         return paginate(self._repository_cards.all_cards(tag_in=tag_in))
 
+    @catch_logs
     async def create_card(self, user_id: str, card_in: CardIn):
         user = self._repository_telegram_user.get(id=user_id)
         card = self._repository_cards.get(author_id=user_id)
@@ -55,6 +59,7 @@ class CardsService:
             },
             commit=True)
 
+    @catch_logs
     async def update_card(self, update_card_in: UpdateCardIn, user_id: str):
         card = self._repository_cards.get(author_id=user_id)
         if update_card_in.first_tag == "Null":
@@ -81,6 +86,7 @@ class CardsService:
             }
         )
 
+    @catch_logs
     async def upload_image(self, user_id, image):
         user = self._repository_telegram_user.get(id=user_id)
 
@@ -97,23 +103,28 @@ class CardsService:
         represantation = {"img_path": f"/image/{user.telegram_id}/{image.filename}"}
         return JSONResponse(status_code=200, content=represantation)
 
+    @catch_logs
     async def user_card(self, username):
         user = self._repository_telegram_user.get(username=username)
         if not user:
             return None
         return self._repository_cards.get(author_id=user.id)
 
+    @catch_logs
     async def my_card(self, user_id):
         return self._repository_cards.get(author_id=user_id)
 
+    @catch_logs
     async def three_last_cards(self):
         return self._repository_cards.three_last_cards()
 
+    @catch_logs
     async def send_message(self, username: str, text: str):
         user = self._repository_telegram_user.get(username=username)
         await bot.send_message(user.telegram_id, text=text)
         return JSONResponse(content="Сообщение было отправлено", status_code=200)
 
+    @catch_logs
     async def add_raiting(self, user_id: str, moderator_id: str, raiting: int):
         moderator_user = self._repository_telegram_user.get(id=moderator_id)
         user = self._repository_telegram_user.get(telegram_id=user_id)
@@ -128,6 +139,7 @@ class CardsService:
         )
         return JSONResponse(content="Рейтинг был обновлён", status_code=200)
 
+    @catch_logs
     async def all_tags(self,):
         tags = [
             "Финтех",

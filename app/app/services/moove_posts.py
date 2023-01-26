@@ -7,7 +7,7 @@ from fastapi_pagination.ext.sqlalchemy import paginate
 from app.repository.moove_posts import RepositoryMoovePosts
 from app.repository.telegram_user import RepositoryTelegramUser
 
-
+from app.logs.logger_config import catch_logs
 
 
 class MoovePostsService:
@@ -20,6 +20,7 @@ class MoovePostsService:
         self._moove_posts_repository = moove_posts_repository
         self._repository_telegram_user = repository_telegram_user
 
+    @catch_logs
     async def upload_post_url(self, url: str, category: str, user_id: str):
         user = self._repository_telegram_user.get(id=user_id)
         if user.role != "moderator":
@@ -47,14 +48,17 @@ class MoovePostsService:
             }, commit=True
         )
 
+    @catch_logs
     async def all_posts(self, category: str):
         if not category:
             return paginate(self._moove_posts_repository.all_posts())
         return paginate(self._moove_posts_repository.filter_category(category=category))
 
+    @catch_logs
     async def three_last_mooove_posts(self):
         return self._moove_posts_repository.three_last_mooove_posts()
 
+    @catch_logs
     async def all_cateogories(self):
         categories = ["Питчинг", "Лекции", "Стартапы выпускников", "Читать буквы"]
         return JSONResponse(content={"categories": categories}, status_code=200)

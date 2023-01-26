@@ -19,6 +19,8 @@ from app.telegram_bot.loader import bot
 
 from app.schemas.posts import PostIn
 
+from app.logs.logger_config import catch_logs
+
 
 class PostsService:
 
@@ -30,6 +32,7 @@ class PostsService:
         self._repository_telegram_user = repository_telegram_user
         self._repository_posts = repository_posts
 
+    @catch_logs
     async def create_post(self, user_id: str, post_in: PostIn):
         user = self._repository_telegram_user.get(id=user_id)
         telegraph = Telegraph(user.telegraph_access_token)
@@ -64,6 +67,7 @@ class PostsService:
 
         return post
 
+    @catch_logs
     async def edit_post(
             self,
             user_id: str,
@@ -103,18 +107,21 @@ class PostsService:
 
         return f"Пост {post.telegraph_url} отредактирован"
 
+    @catch_logs
     async def delete_post(self, user_id: str, post_url: str):
         post = self._repository_posts.get(telegraph_url=post_url)
         if post.author_id != user_id:
             return JSONResponse(cstatus_code=403, content={"error": "Вы не являетесь автором поста"})
         return self._repository_posts.delete(db_obj=post, commit=True)
 
+    @catch_logs
     async def all_user_posts(
             self,
             user_id: str,):
         user_id = self._repository_telegram_user.get(telegram_id=user_id).id
         return self._repository_posts.list(author_id=user_id, status=Posts.PostStatus.published)
 
+    @catch_logs
     async def my_posts(self, user_id: str):
         representation = {
             "published": self._repository_posts.list(author_id=user_id, status=Posts.PostStatus.published),
@@ -126,6 +133,7 @@ class PostsService:
         }
         return representation
 
+    @catch_logs
     async def all_types_posts(self, user_id: str):
         followings = self._repository_telegram_user.get(id=user_id).followings
         followings_ids = [following.id for following in followings]
@@ -136,20 +144,25 @@ class PostsService:
         }
         return representaion
 
+    @catch_logs
     async def popular_posts(self,):
         return paginate(self._repository_posts.most_popular())
 
+    @catch_logs
     async def recent_posts(self,):
         return paginate(self._repository_posts.most_recent())
 
+    @catch_logs
     async def my_feed(self, user_id: str):
         followings = self._repository_telegram_user.get(id=user_id).followings
         followings_ids = [following.id for following in followings]
         return paginate(self._repository_posts.feed(followings_ids=followings_ids))
 
+    @catch_logs
     async def three_last_posts(self,):
         return self._repository_posts.three_last_posts()
 
+    @catch_logs
     async def upload_image(
             self,
             user_id: str,
@@ -171,6 +184,7 @@ class PostsService:
             content={"img_path": f"/image/{user.telegram_id}/{image.filename}"}
         )
 
+    @catch_logs
     async def upload_video(
             self,
             user_id: str,
@@ -192,6 +206,7 @@ class PostsService:
             content={"video_path": f"/video/{user.telegram_id}/{video.filename}"}
         )
 
+    @catch_logs
     async def get_draft_post(self, user_id: str, post_id: str):
         post = self._repository_posts.get(id=post_id)
         if post.author_id != user_id:
