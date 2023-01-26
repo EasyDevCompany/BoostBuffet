@@ -11,4 +11,4 @@ class RepositoryMoovePosts(RepositoryBase[MoovePosts]):
         return self._session.query(self._model).filter_by(category=category)
 
     def three_last_mooove_posts(self):
-        return self._session.query(self._model).order_by(self._model.created_at.desc()).all()[:4]
+        return self._session.query(self._model).order_by(self._model.created_at.desc()).all()[:3]
