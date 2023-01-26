@@ -13,19 +13,6 @@ async def create_session():
 
 
 @inject
-async def bot_token_verification(
-        token: str = Header(default=None, alias="TOKEN"),
-        repository_telegram_user = Depends(Provide[Container.repository_telegram_user])
-):
-    if not token:
-        raise HTTPException(403)
-    user = repository_telegram_user.get(telegram_id=token)
-    if not user or not token:
-        raise HTTPException(403)
-    return user.id
-
-
-@inject
 def commit_and_close_session(func):
 
     @wraps(func)
@@ -44,3 +31,17 @@ def commit_and_close_session(func):
             db.scoped_session.remove()
 
     return wrapper
+
+
+@commit_and_close_session
+@inject
+async def bot_token_verification(
+        token: str = Header(default=None, alias="TOKEN"),
+        repository_telegram_user = Depends(Provide[Container.repository_telegram_user])
+):
+    if not token:
+        raise HTTPException(403)
+    user = repository_telegram_user.get(telegram_id=token)
+    if not user or not token:
+        raise HTTPException(403)
+    return user.id
