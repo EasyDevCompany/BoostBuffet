@@ -171,6 +171,27 @@ class PostsService:
             content={"img_path": f"/image/{user.telegram_id}/{image.filename}"}
         )
 
+    async def upload_video(
+            self,
+            user_id: str,
+            video):
+        user = self._repository_telegram_user.get(id=user_id)
+
+        current_file = Path(__file__)
+        current_file_dir = current_file.parent
+        project_root = current_file_dir.parent.parent / f"video/{user.telegram_id}"
+        project_root_absolute = project_root.resolve()
+        random_name = randint(1, 100_000)
+        static_root_absolute = project_root_absolute / f"{random_name}.mp4"
+        file_location = static_root_absolute
+        with open(file_location, "wb+") as file_object:
+            video.filename = f"{random_name}.mp4"
+            file_object.write(video.file.read())
+        return JSONResponse(
+            status_code=200,
+            content={"video_path": f"/video/{user.telegram_id}/{video.filename}"}
+        )
+
     async def get_draft_post(self, user_id: str, post_id: str):
         post = self._repository_posts.get(id=post_id)
         if post.author_id != user_id:

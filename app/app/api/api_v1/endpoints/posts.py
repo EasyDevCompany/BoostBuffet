@@ -40,6 +40,19 @@ async def upload_image(
     )
 
 
+@router.post('/upload_video')
+@inject
+@commit_and_close_session
+async def upload_video(
+        video: UploadFile = File(...),
+        token = Depends(bot_token_verification),
+        posts_service = Depends(Provide[Container.posts_service])):
+    return await posts_service.upload_video(
+        user_id=token,
+        video=video
+    )
+
+
 @router.post("/edit_post")
 @inject
 @commit_and_close_session

@@ -23,8 +23,10 @@ async def process_start_command(
     """Выполняется при команде /start."""
     scope.set(str(uuid4))
     user = rep_telegram_user.get(telegram_id=int(message.from_user.id))
+    create_folder_for_user_video
     await download_profile_picture(tg_user_id=message.from_user.id, telegram_id=message.from_user.id)
     if not user:
+        print("FOBAR")
         res = Container.telegraph.create_account(short_name=message.from_user.username)
         user_info = await bot.get_chat(message.from_user.id)
         user = rep_telegram_user.create(
@@ -39,8 +41,8 @@ async def process_start_command(
                 "raiting": 0
             }, commit=True)
         await create_folder_for_user_image(telegram_id=message.from_user.id)
-
-        await bot.send_message(message.from_user.id, const.START_TEXT, reply_markup=get_menu_button())
+        await create_folder_for_user_video(telegram_id=message.from_user.id)
+        await bot.send_message(message.from_user.id, f"Привет, {message.from_user.username}🦄🦄🦄! \n\n{const.START_TEXT}", reply_markup=get_menu_button())
     else:
         await bot.send_message(message.from_user.id, f"Привет, {message.from_user.username}🦄🦄🦄! \n\n{const.START_TEXT}", reply_markup=get_menu_button())
         await bot.set_chat_menu_button(
@@ -49,16 +51,28 @@ async def process_start_command(
         )
 
 
-async def create_folder_for_user_image(telegram_id):
-    post_image_dir = await get_image_dir() / str(telegram_id)
-    post_image_dir.mkdir(parents=True, exist_ok=True)
-
-
 async def get_image_dir():
     current_file = Path(__file__)
     current_file_dir = current_file.parent
     project_root = current_file_dir.parent.parent.parent
     return project_root / "image"
+
+
+async def get_video_dir():
+    current_file = Path(__file__)
+    current_file_dir = current_file.parent
+    project_root = current_file_dir.parent.parent.parent
+    return project_root / "video"
+
+
+async def create_folder_for_user_image(telegram_id):
+    post_image_dir = await get_image_dir() / str(telegram_id)
+    post_image_dir.mkdir(parents=True, exist_ok=True)
+
+
+async def create_folder_for_user_video(telegram_id):
+    post_image_dir = await get_video_dir() / str(telegram_id)
+    post_image_dir.mkdir(parents=True, exist_ok=True)
 
 
 async def download_profile_picture(tg_user_id: str, telegram_id: str):
