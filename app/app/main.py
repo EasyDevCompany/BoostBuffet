@@ -30,8 +30,10 @@ def create_app():
     current_file_dir = current_file.parent
     project_root = current_file_dir.parent
     project_root_absolute = project_root.resolve()
-    static_root_absolute = project_root_absolute / "image"
-    fastapi_app.mount("/image", StaticFiles(directory=static_root_absolute), name="image")
+    image_static_root_absolute = project_root_absolute / "image"
+    video_static_root_absolute = project_root_absolute / "video"
+    fastapi_app.mount("/image", StaticFiles(directory=image_static_root_absolute), name="image")
+    fastapi_app.mount("/video", StaticFiles(directory=video_static_root_absolute), name="video")
     fastapi_app.include_router(api.api_router, prefix=settings.API_V1_STR)
     add_pagination(fastapi_app)
     return fastapi_app
