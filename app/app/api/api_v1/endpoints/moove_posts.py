@@ -41,3 +41,12 @@ async def all_categories(
         token = Depends(bot_token_verification),
         moove_service = Depends(Provide[Container.moove_posts_service])):
     return await moove_service.all_cateogories()
+
+
+@router.post("/three_last_mooove_posts")
+@inject
+@commit_and_close_session
+async def three_last_mooove_posts(
+        token = Depends(bot_token_verification),
+        moove_service = Depends(Provide[Container.moove_posts_service])):
+    return await moove_service.three_last_mooove_posts()

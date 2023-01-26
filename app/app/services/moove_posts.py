@@ -52,6 +52,9 @@ class MoovePostsService:
             return paginate(self._moove_posts_repository.all_posts())
         return paginate(self._moove_posts_repository.filter_category(category=category))
 
+    async def three_last_mooove_posts(self):
+        return self._moove_posts_repository.three_last_mooove_posts()
+
     async def all_cateogories(self):
         categories = ["Питчинг", "Лекции", "Стартапы выпускников", "Читать буквы"]
         return JSONResponse(content={"categories": categories}, status_code=200)
