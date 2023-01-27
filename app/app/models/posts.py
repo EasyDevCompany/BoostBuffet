@@ -34,6 +34,7 @@ class Posts(Base):
     content = Column(String)
     views_count = Column(Integer, default=0)
     comments_count = Column(Integer, default=0)
+    raiting = Column(Integer, default=0)
 
     status = Column(Enum(PostStatus), default=PostStatus.draft)
     likes_amount = Column(Integer, default=0)
