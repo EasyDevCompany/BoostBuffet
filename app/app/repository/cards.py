@@ -9,7 +9,7 @@ from app.schemas.cards import TagIn
 
 class RepositoryCards(RepositoryBase[Cards]):
 
-    def all_cards(self, tag_in: TagIn):
+    def all_cards(self, tag_in: TagIn, user_id: str):
         tags = [
             "Финтех",
             "Дизайн",
@@ -53,7 +53,7 @@ class RepositoryCards(RepositoryBase[Cards]):
         ]
         query = self._session.query(
             self._model
-            ).filter_by(aprroval_status=Cards.ApprovalStatus.approved)
+            ).filter_by(aprroval_status=Cards.ApprovalStatus.approved).filter(self._model.author_id!=user_id)
         # Есть 2^3 = 8 вероятных возможностей для комбинацией тегов 
         # Здесь описаны все 8. 000, 100, 010, 001, 110, 101, 011, 111
         # Где first_tag, second_tag, third_tag расположены соответственно порядку цифр

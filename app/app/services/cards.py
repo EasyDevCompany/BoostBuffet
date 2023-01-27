@@ -31,9 +31,10 @@ class CardsService:
     @catch_logs
     async def all_cards(
             self,
-            tag_in: TagIn):
+            tag_in: TagIn,
+            user_id: str):
 
-        return paginate(self._repository_cards.all_cards(tag_in=tag_in))
+        return paginate(self._repository_cards.all_cards(tag_in=tag_in, user_id=user_id))
 
     @catch_logs
     async def create_card(self, user_id: str, card_in: CardIn):

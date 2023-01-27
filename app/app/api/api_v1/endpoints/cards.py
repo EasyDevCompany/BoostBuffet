@@ -22,7 +22,7 @@ async def all_cards(
         tag_in: TagIn,
         token = Depends(bot_token_verification),
         cards_service = Depends(Provide[Container.cards_service]),):
-    return await cards_service.all_cards(tag_in=tag_in)
+    return await cards_service.all_cards(tag_in=tag_in, user_id=token)
 
 
 @router.post("/create_card", response_model=DefaultCard)
