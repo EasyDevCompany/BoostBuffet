@@ -19,6 +19,9 @@ from app.telegram_bot.loader import bot
 
 from app.schemas.posts import PostIn
 
+from app.logs.logger_config import catch_logs
+
+from loguru import logger
 
 class PostsService:
 
@@ -30,6 +33,7 @@ class PostsService:
         self._repository_telegram_user = repository_telegram_user
         self._repository_posts = repository_posts
 
+    @catch_logs
     async def create_post(self, user_id: str, post_in: PostIn):
         user = self._repository_telegram_user.get(id=user_id)
         telegraph = Telegraph(user.telegraph_access_token)
@@ -44,7 +48,7 @@ class PostsService:
                     "path": post.get("path"),
                     "title": post.get("title"),
                     "content": post_in.content,
-                    "subtitle": post_in.subtitle,
+                    "subtitle": post_in.subtitle or None,
                     "status": Posts.PostStatus.draft,
                     "author": user,
                 }, commit=True)
@@ -64,6 +68,7 @@ class PostsService:
 
         return post
 
+    @catch_logs
     async def edit_post(
             self,
             user_id: str,
@@ -103,18 +108,21 @@ class PostsService:
 
         return f"Пост {post.telegraph_url} отредактирован"
 
+    @catch_logs
     async def delete_post(self, user_id: str, post_url: str):
         post = self._repository_posts.get(telegraph_url=post_url)
         if post.author_id != user_id:
             return JSONResponse(cstatus_code=403, content={"error": "Вы не являетесь автором поста"})
         return self._repository_posts.delete(db_obj=post, commit=True)
 
+    @catch_logs
     async def all_user_posts(
             self,
             user_id: str,):
         user_id = self._repository_telegram_user.get(telegram_id=user_id).id
         return self._repository_posts.list(author_id=user_id, status=Posts.PostStatus.published)
 
+    @catch_logs
     async def my_posts(self, user_id: str):
         representation = {
             "published": self._repository_posts.list(author_id=user_id, status=Posts.PostStatus.published),
@@ -126,6 +134,7 @@ class PostsService:
         }
         return representation
 
+    @catch_logs
     async def all_types_posts(self, user_id: str):
         followings = self._repository_telegram_user.get(id=user_id).followings
         followings_ids = [following.id for following in followings]
@@ -136,20 +145,25 @@ class PostsService:
         }
         return representaion
 
+    @catch_logs
     async def popular_posts(self,):
         return paginate(self._repository_posts.most_popular())
 
+    @catch_logs
     async def recent_posts(self,):
         return paginate(self._repository_posts.most_recent())
 
+    @catch_logs
     async def my_feed(self, user_id: str):
         followings = self._repository_telegram_user.get(id=user_id).followings
         followings_ids = [following.id for following in followings]
         return paginate(self._repository_posts.feed(followings_ids=followings_ids))
 
+    @catch_logs
     async def three_last_posts(self,):
         return self._repository_posts.three_last_posts()
 
+    @catch_logs
     async def upload_image(
             self,
             user_id: str,
@@ -168,11 +182,50 @@ class PostsService:
             file_object.write(image.file.read())
         return JSONResponse(
             status_code=200,
-            content={"img_url": f"{settings.SERVER_IP}/image/{user.telegram_id}/{image.filename}"}
+            content={"img_path": f"/image/{user.telegram_id}/{image.filename}"}
         )
 
+    @catch_logs
+    async def upload_video(
+            self,
+            user_id: str,
+            video):
+        user = self._repository_telegram_user.get(id=user_id)
+
+        current_file = Path(__file__)
+        current_file_dir = current_file.parent
+        project_root = current_file_dir.parent.parent / f"video/{user.telegram_id}"
+        project_root_absolute = project_root.resolve()
+        random_name = randint(1, 100_000)
+        static_root_absolute = project_root_absolute / f"{random_name}.mp4"
+        file_location = static_root_absolute
+        with open(file_location, "wb+") as file_object:
+            video.filename = f"{random_name}.mp4"
+            file_object.write(video.file.read())
+        return JSONResponse(
+            status_code=200,
+            content={"video_path": f"/video/{user.telegram_id}/{video.filename}"}
+        )
+
+    @catch_logs
     async def get_draft_post(self, user_id: str, post_id: str):
         post = self._repository_posts.get(id=post_id)
         if post.author_id != user_id:
             return JSONResponse(status_code=403, content="Это не ваша черновая статья.")
         return post
+
+    async def leader_board(self):
+        leader_board_stats = self._repository_posts.users_leader_board()
+        stat_list = []
+        for stats in leader_board_stats:
+            user_stat = {
+                "id": stats[0],
+                "first_name": stats[1],
+                "surname": stats[2],
+                "username": stats[3],
+                "views": stats[4],
+                "reactions": stats[5],
+                "comments": stats[6]
+            }
+            stat_list.append(user_stat)
+        return stat_list

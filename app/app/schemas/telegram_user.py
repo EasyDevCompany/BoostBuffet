@@ -7,6 +7,7 @@ class TgProfileOut(BaseModel):
     username_link: Optional[str]
     first_name: Optional[str]
     surname: Optional[str]
+    description: Optional[str]
 
     class Config:
         orm_mode = True

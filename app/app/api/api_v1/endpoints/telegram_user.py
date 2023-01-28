@@ -4,7 +4,7 @@ from dependency_injector.wiring import inject, Provide
 
 from app.core.containers import Container
 
-from app.api.deps import bot_token_verification
+from app.api.deps import bot_token_verification, commit_and_close_session
 
 from app.schemas.follow_relation import FollowIn
 from app.schemas.telegram_user import TgProfileOut
@@ -15,6 +15,7 @@ router = APIRouter()
 
 @router.get("/my_profile", response_model=TgProfileOut)
 @inject
+@commit_and_close_session
 async def my_profile(
         token = Depends(bot_token_verification),
         telegram_service = Depends(Provide[Container.telegram_user_service])):
@@ -23,6 +24,7 @@ async def my_profile(
 
 @router.post("/subscribe")
 @inject
+@commit_and_close_session
 async def subscribe(
         follow_in: FollowIn,
         token = Depends(bot_token_verification),

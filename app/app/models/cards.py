@@ -88,12 +88,13 @@ class Cards(Base):
     surname = Column(String, nullable=True)
     raiting = Column(Integer, default=0)
     description = Column(String(150), nullable=True)
+    bio = Column(String(1000), nullable=True)
 
     aprroval_status = Column(Enum(ApprovalStatus), default=ApprovalStatus.draft)
     role = Column(Enum(CardRole), default=CardRole.beginner)
-    first_tag = Column(Enum(Tag), nullable=False)
-    second_tag = Column(Enum(Tag), nullable=False)
-    third_tag = Column(Enum(Tag), nullable=False)
+    first_tag = Column(Enum(Tag), nullable=True)
+    second_tag = Column(Enum(Tag), nullable=True)
+    third_tag = Column(Enum(Tag), nullable=True)
     proffesion = Column(Enum(Proffesion), default=Proffesion.student)
     chat_open = Column(Enum(ChatOpen), default=ChatOpen.available)
 
@@ -105,7 +106,7 @@ class Cards(Base):
 
     @property
     def card_profile_img(self):
-        return f"{settings.SERVER_IP}/image/{self.author.telegram_id}/card_image.png"
+        return f"/image/{self.author.telegram_id}/card_image.png"
 
     @property
     def author_username(self):

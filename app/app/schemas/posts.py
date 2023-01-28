@@ -8,7 +8,7 @@ from datetime import datetime
 
 class PostIn(BaseModel):
     title: str = "title"
-    subtitle: str = "subtitle"
+    subtitle: Optional[str]
     content: str = "content"
 
     class Config:
@@ -20,6 +20,7 @@ class DefaultPosts(BaseModel):
     post_image: Optional[str]
     telegraph_url: str
     title: str
+    subtitle: str
     content: str
     created_at: datetime
     status: str
@@ -58,3 +59,16 @@ class AllPosts(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class LeaderBoard(BaseModel):
+    id: UUID
+    first_name: str
+    surname: str
+    username: str
+    views: int
+    reactions: int
+    comments: int
+
+    class Config:
+        orm_mode = True 

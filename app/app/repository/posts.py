@@ -3,7 +3,7 @@ from sqlalchemy.orm import joinedload
 
 from .base import RepositoryBase
 from app.models.posts import Posts
-
+from app.models.telegram_user import TelegramUser
 
 class RepositoryPosts(RepositoryBase[Posts]):
     def count_draft_posts(self, author_id: str):
@@ -40,3 +40,18 @@ class RepositoryPosts(RepositoryBase[Posts]):
         return self._session.query(
             self._model
             ).filter_by(status=Posts.PostStatus.draft).order_by(self._model.created_at.asc()).first()
+
+    def users_leader_board(self):
+        return self._session.query(
+            TelegramUser.id,
+            TelegramUser.first_name,
+            TelegramUser.surname,
+            TelegramUser.username,
+            func.sum(self._model.views_count),
+            func.sum(self._model.likes_amount),
+            func.sum(self._model.comments_count)
+        ).filter(self._model.author_id == TelegramUser.id).group_by(TelegramUser.id).order_by(
+            (func.sum(self._model.views_count) + 
+            (func.sum(self._model.likes_amount) * 1.5) + 
+            (func.sum(self._model.comments_count) * 3)).desc()
+        ).all()

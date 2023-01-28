@@ -2,6 +2,8 @@ from typing import Optional
 
 from pydantic import BaseModel, root_validator
 
+from uuid import UUID
+
 
 class TagIn(BaseModel):
     first_tag: Optional[str] = "None"
@@ -10,6 +12,7 @@ class TagIn(BaseModel):
 
 
 class DefaultCard(BaseModel):
+    id: UUID
     author_username: str
     first_name: Optional[str]
     surname: Optional[str]
@@ -18,9 +21,9 @@ class DefaultCard(BaseModel):
     aprroval_status: str
     role: str
     proffesion: str
-    first_tag: str
-    second_tag: str
-    third_tag: str
+    first_tag: Optional[str]
+    second_tag: Optional[str]
+    third_tag: Optional[str]
     chat_open: str
     card_profile_img: str
 
@@ -36,16 +39,21 @@ class CardsOut(BaseModel):
 
 
 class CardIn(BaseModel):
-    description: str
-    first_tag: str
-    second_tag: str
-    third_tag: str
+    description: Optional[str] = "Null"
+    bio: Optional[str] = "Null"
+    first_tag: Optional[str]
+    second_tag: Optional[str]
+    third_tag: Optional[str]
     chat_available: str = "available"
 
     @root_validator
     @classmethod
     def validate_tags_not_equal(cls, field_value):
-        if len(set((field_value["first_tag"], field_value["second_tag"], field_value["third_tag"]))) <3:
+        if field_value["first_tag"] and field_value["first_tag"] in (field_value["second_tag"], field_value["third_tag"]):
+            raise ValueError("Вы не можете выбрать одинаковые тэги")
+        if field_value["second_tag"] and field_value["second_tag"] in (field_value["first_tag"], field_value["third_tag"]):
+            raise ValueError("Вы не можете выбрать одинаковые тэги")
+        if field_value["third_tag"] and field_value["third_tag"] in (field_value["first_tag"], field_value["second_tag"]):
             raise ValueError("Вы не можете выбрать одинаковые тэги")
         return field_value
 
@@ -53,6 +61,7 @@ class CardIn(BaseModel):
 class UpdateCardIn(BaseModel):
     chat_open: Optional[str]
     description: Optional[str]
+    bio: Optional[str]
     first_tag: Optional[str]
     second_tag: Optional[str]
     third_tag: Optional[str]

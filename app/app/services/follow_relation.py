@@ -4,6 +4,8 @@ from app.repository.telegram_user import RepositoryTelegramUser, FollowRelations
 
 from app.schemas.follow_relation import FollowIn
 
+from app.logs.logger_config import catch_logs
+
 class FollowService:
 
     def __init__(
@@ -14,6 +16,7 @@ class FollowService:
         self._repository_telegram_user = repository_telegram_user
         self._repository_follow_relation = repository_follow_relation
 
+    @catch_logs
     async def create_follow(
             self,
             follower_id: str,

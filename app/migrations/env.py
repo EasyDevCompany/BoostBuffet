@@ -25,12 +25,14 @@ from app.db.base import Base  # noqa
 from app.models.telegram_user import TelegramUser
 from app.models.posts import Posts
 from app.models.cards import Cards
+from app.models.moove_posts import MoovePosts
 from app.core.config import settings
 
 target_metadata = TelegramUser.metadata
 target_metadata = Posts.metadata
 target_metadata = Base.metadata
 target_metadata = Cards.metadata
+target_metadata = MoovePosts.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

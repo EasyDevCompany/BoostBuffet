@@ -11,6 +11,7 @@ class PostsView(ModelView):
         "status",
         "views_amount",
         "likes_amount",
+        "raiting",
         "created_at",
         "author_id",
     ]

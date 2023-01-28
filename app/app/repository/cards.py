@@ -9,7 +9,7 @@ from app.schemas.cards import TagIn
 
 class RepositoryCards(RepositoryBase[Cards]):
 
-    def all_cards(self, tag_in: TagIn):
+    def all_cards(self, tag_in: TagIn, user_id: str):
         tags = [
             "Финтех",
             "Дизайн",
@@ -53,7 +53,7 @@ class RepositoryCards(RepositoryBase[Cards]):
         ]
         query = self._session.query(
             self._model
-            ).filter_by(aprroval_status=Cards.ApprovalStatus.approved)
+            ).filter_by(aprroval_status=Cards.ApprovalStatus.approved).filter(self._model.author_id!=user_id)
         # Есть 2^3 = 8 вероятных возможностей для комбинацией тегов 
         # Здесь описаны все 8. 000, 100, 010, 001, 110, 101, 011, 111
         # Где first_tag, second_tag, third_tag расположены соответственно порядку цифр
@@ -100,7 +100,7 @@ class RepositoryCards(RepositoryBase[Cards]):
                 or_(
                     self._model.first_tag.in_((tag_in.first_tag , tag_in.second_tag)),
                     self._model.second_tag.in_((tag_in.first_tag, tag_in.second_tag)),
-                    self._model.third.in_((tag_in.first_tag, tag_in.second_tag)),
+                    self._model.third_tag.in_((tag_in.first_tag, tag_in.second_tag)),
                 )
             )
         # 101
@@ -123,3 +123,15 @@ class RepositoryCards(RepositoryBase[Cards]):
             )
         # 000
         return query
+    
+    def three_last_cards(self,):
+        return self._session.query(
+            self._model
+            ).filter_by(
+                aprroval_status=Cards.ApprovalStatus.approved
+                ).order_by(self._model.raiting.desc()).all()[:3]
+
+    def most_outdated_card(self,):
+        return self._session.query(
+            self._model
+            ).filter_by(aprroval_status=Cards.ApprovalStatus.draft).first()

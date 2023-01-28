@@ -34,7 +34,6 @@ class RepositoryBase(Generic[ModelType, ]):
             obj_in
     ) -> ModelType:
         obj_data = jsonable_encoder(db_obj)
-        print(jsonable_encoder(db_obj))
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
