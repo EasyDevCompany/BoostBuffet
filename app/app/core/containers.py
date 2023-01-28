@@ -15,6 +15,7 @@ from app.services.posts import PostsService
 from app.services.follow_relation import FollowService
 from app.services.telegram_user import TelegramUserService
 from app.services.cards import CardsService
+from app.services.leader_board import LeaderBoardService
 
 from app.workers.get_all_post_stat import AllPostTask
 
@@ -84,6 +85,12 @@ class Container(containers.DeclarativeContainer):
     cards_service = providers.Singleton(
         CardsService,
         repository_cards=reposotory_cards,
+        repository_telegram_user=repository_telegram_user
+    )
+
+    leader_board_service = providers.Singleton(
+        LeaderBoardService,
+        repository_posts=repository_posts,
         repository_telegram_user=repository_telegram_user
     )
 
