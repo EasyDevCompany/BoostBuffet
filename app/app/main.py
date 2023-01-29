@@ -29,7 +29,6 @@ def create_app():
     fastapi_app.mount("/video", StaticFiles(directory=video_static_root_absolute), name="video")
     fastapi_app.include_router(api.api_router, prefix=settings.API_V1_STR)
     add_pagination(fastapi_app)
-    # , "https://my-app51.vercel.app/networking/me", "https://my-app51.vercel.app", "https://my-app51.vercel.app/"
     fastapi_app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],  # Allows all origins
