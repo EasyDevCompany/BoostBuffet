@@ -64,9 +64,9 @@ class AllPosts(BaseModel):
 class LeaderBoard(BaseModel):
     id: UUID
     telegram_id: str
-    first_name: str
-    surname: str
-    username: str
+    first_name: Optional[str]
+    surname: Optional[str]
+    username: Optional[str]
     views: int
     reactions: int
     comments: int
