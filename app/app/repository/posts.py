@@ -44,6 +44,7 @@ class RepositoryPosts(RepositoryBase[Posts]):
     def users_leader_board(self):
         return self._session.query(
             TelegramUser.id,
+            TelegramUser.telegram_id,
             TelegramUser.first_name,
             TelegramUser.surname,
             TelegramUser.username,

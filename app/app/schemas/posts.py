@@ -63,6 +63,7 @@ class AllPosts(BaseModel):
 
 class LeaderBoard(BaseModel):
     id: UUID
+    telegram_id: str
     first_name: str
     surname: str
     username: str

@@ -220,12 +220,13 @@ class PostsService:
         for stats in leader_board_stats:
             user_stat = {
                 "id": stats[0],
-                "first_name": stats[1],
-                "surname": stats[2],
-                "username": stats[3],
-                "views": stats[4],
-                "reactions": stats[5],
-                "comments": stats[6]
+                "telegram_id": stats[1],
+                "first_name": stats[2],
+                "surname": stats[3],
+                "username": stats[4],
+                "views": stats[5],
+                "reactions": stats[6],
+                "comments": stats[7]
             }
             stat_list.append(user_stat)
         return stat_list
