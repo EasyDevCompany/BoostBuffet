@@ -23,6 +23,9 @@ from app.logs.logger_config import catch_logs
 
 from loguru import logger
 
+from app.telegram_bot.keyboards.moderator_keyboards import get_post_approve_buttons, get_card_approve_buttons
+
+
 class PostsService:
 
     def __init__(
@@ -58,6 +61,9 @@ class PostsService:
                 "Ваш пост отправлен на модерацию.",
                 parse_mode='HTML'
             )
+            moderators = self._repository_telegram_user.get_moderators()
+            for moderator in moderators:
+                await bot.send_message(moderator.telegram_id, post.telegraph_url, reply_markup=get_post_approve_buttons(post_id=post.id))
 
         except TelegraphException as er:
             if str(er) == "TITLE_TOO_LONG":

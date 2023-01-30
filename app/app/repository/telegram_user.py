@@ -3,7 +3,11 @@ from .base import RepositoryBase
 
 
 class RepositoryTelegramUser(RepositoryBase[TelegramUser]):
-    pass
+
+    def get_moderators(self,):
+        return self._session.query(
+            self._model
+            ).filter_by(role=TelegramUser.UserRole.moderator).all()
 
 
 class RepositoryFollowRelationship(RepositoryBase[FollowRelationship]):
