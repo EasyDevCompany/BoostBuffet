@@ -115,6 +115,10 @@ class PostsService:
         return self._repository_posts.delete(db_obj=post, commit=True)
 
     @catch_logs
+    async def get_post(self, post_id: str):
+        return self._repository_posts.get(id=post_id)
+
+    @catch_logs
     async def all_user_posts(
             self,
             user_id: str,):

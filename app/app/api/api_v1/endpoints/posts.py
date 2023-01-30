@@ -79,6 +79,18 @@ async def delete_post(
         post_url=post_url,)
 
 
+@router.get("/post/{post_id}", response_model=PublishedPosts)
+@inject
+@commit_and_close_session
+async def post(
+        post_id: str,
+        token = Depends(bot_token_verification),
+        posts_service = Depends(Provide[Container.posts_service])):
+    return await posts_service.get_post(
+        post_id=post_id,
+    )
+
+
 @router.get("/user_posts/{user_id}", response_model=list[PublishedPosts])
 @inject
 @commit_and_close_session
