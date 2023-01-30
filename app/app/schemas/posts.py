@@ -20,7 +20,7 @@ class DefaultPosts(BaseModel):
     post_image: Optional[str]
     telegraph_url: str
     title: str
-    subtitle: str
+    subtitle: Optional[str]
     content: str
     created_at: datetime
     status: str
