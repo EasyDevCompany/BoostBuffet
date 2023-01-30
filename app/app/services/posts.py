@@ -41,9 +41,13 @@ class PostsService:
         user = self._repository_telegram_user.get(id=user_id)
         telegraph = Telegraph(user.telegraph_access_token)
         try:
+            author_url = 'https://t.me/boostbuffettest'
             post = telegraph.create_page(
                 post_in.title or '',
-                html_content=post_in.content
+                author_url=author_url,
+                author_name="MOOVE Медиахаб boostbuffettest",
+                html_content=post_in.content + f"<br><br>Автор: @{user.username}"
+                
             )
             post = self._repository_posts.create(
                 obj_in={
@@ -74,7 +78,7 @@ class PostsService:
                 return JSONResponse(status_code=400, content={"error": "Слишком длинный заголовок"})
             if str(er) == "ACCESS_TOKEN_INVALID":
                 return JSONResponse(status_code=400, content={"error": "Неверный токен!"})
-            return JSONResponse(status_code=400, content={"error": "Неизвестная ошибка, попробуйте еще раз."})
+            return JSONResponse(status_code=400, content={"error": f"{er}"})
 
         return post
 
