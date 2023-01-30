@@ -46,7 +46,7 @@ class PostsService:
                 post_in.title or '',
                 author_url=author_url,
                 author_name="MOOVE Медиахаб boostbuffettest",
-                html_content=post_in.content + f"<br><br>Автор: @{user.username}"
+                html_content=post_in.content + f"<br><br>Автор: <a href='https://t.me/{user.username}'>@{user.username}</a>"
                 
             )
             post = self._repository_posts.create(
