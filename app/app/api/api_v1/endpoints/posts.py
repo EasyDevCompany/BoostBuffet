@@ -4,9 +4,10 @@ from dependency_injector.wiring import inject, Provide
 
 from typing import Optional
 
+
 from app.core.containers import Container
 from app.api.deps import bot_token_verification, commit_and_close_session
-from app.schemas.posts import PublishedPosts, PostIn, MyPosts, AllPosts, DefaultPosts
+from app.schemas.posts import PublishedPosts, PostIn, MyPosts, AllPosts, DefaultPosts, LeaderBoard
 
 from fastapi_pagination import Page
 
@@ -173,3 +174,13 @@ async def get_draft_post(
         token = Depends(bot_token_verification),
         posts_service = Depends(Provide[Container.posts_service])):
     return await posts_service.get_draft_post(user_id=token, post_id=post_id)
+
+
+@router.get("/leader_board", response_model=list[LeaderBoard])
+@inject
+@commit_and_close_session
+async def get_leader_board(
+        token = Depends(bot_token_verification),
+        posts_service = Depends(Provide[Container.posts_service])
+):
+    return await posts_service.leader_board()

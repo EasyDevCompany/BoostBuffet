@@ -21,6 +21,7 @@ from app.schemas.posts import PostIn
 
 from app.logs.logger_config import catch_logs
 
+from loguru import logger
 
 class PostsService:
 
@@ -216,3 +217,20 @@ class PostsService:
         if post.author_id != user_id:
             return JSONResponse(status_code=403, content="Это не ваша черновая статья.")
         return post
+
+    async def leader_board(self):
+        leader_board_stats = self._repository_posts.users_leader_board()
+        stat_list = []
+        for stats in leader_board_stats:
+            user_stat = {
+                "id": stats[0],
+                "telegram_id": stats[1],
+                "first_name": stats[2],
+                "surname": stats[3],
+                "username": stats[4],
+                "views": stats[5],
+                "reactions": stats[6],
+                "comments": stats[7]
+            }
+            stat_list.append(user_stat)
+        return stat_list

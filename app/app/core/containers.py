@@ -16,7 +16,10 @@ from app.services.posts import PostsService
 from app.services.follow_relation import FollowService
 from app.services.telegram_user import TelegramUserService
 from app.services.cards import CardsService
+
+
 from app.services.moove_posts import MoovePostsService
+
 
 from app.workers.get_all_post_stat import AllPostTask
 

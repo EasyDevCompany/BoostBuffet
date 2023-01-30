@@ -17,13 +17,6 @@ def create_app():
     fastapi_app = FastAPI(
         title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json"
     )
-    fastapi_app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],  # Allows all origins
-        allow_credentials=True,
-        allow_methods=["*"],  # Allows all methods
-        allow_headers=["*"],  # Allows all headers
-    )
     fastapi_app.container = container
 
     current_file = Path(__file__)
@@ -36,6 +29,13 @@ def create_app():
     fastapi_app.mount("/video", StaticFiles(directory=video_static_root_absolute), name="video")
     fastapi_app.include_router(api.api_router, prefix=settings.API_V1_STR)
     add_pagination(fastapi_app)
+    fastapi_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Allows all origins
+        allow_credentials=True,
+        allow_methods=["*"],  # Allows all methods
+        allow_headers=["*"],  # Allows all headers
+    )
     return fastapi_app
 
 
