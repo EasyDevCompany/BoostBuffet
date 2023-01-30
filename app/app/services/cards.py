@@ -127,11 +127,13 @@ class CardsService:
 
     @catch_logs
     async def add_raiting(self, user_id: str, moderator_id: str, raiting: int):
-        moderator_user = self._repository_telegram_user.get(id=moderator_id)
-        user = self._repository_telegram_user.get(telegram_id=user_id)
+        moderator_user = self._repository_telegram_user.get(telegram_id=moderator_id)
+        user = self._repository_telegram_user.get(id=user_id)
         if moderator_user.role != "moderator":
             return JSONResponse(content="У вас нет прав на обновление рейтинга", status_code=403)
         card = self._repository_cards.get(author_id=user.id)
+        if not card:
+            return JSONResponse(content={"error_msg": "У вас нет карточки"}, status_code=403)
         self._repository_cards.update(
             db_obj=card,
             obj_in={

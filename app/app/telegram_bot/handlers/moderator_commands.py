@@ -10,6 +10,7 @@ from app.telegram_bot.loader import bot, dp
 from app.core.containers import Container, TelegramUser, Posts, Cards
 from app.db.session import scope
 from app.telegram_bot.keyboards.moderator_keyboards import get_post_approve_buttons, get_card_approve_buttons
+from app.api.deps import commit_and_close_session
 
 
 
@@ -34,20 +35,22 @@ async def process_start_command(
 @dp.callback_query_handler(lambda c: "postapprove_" in c.data)
 @dp.callback_query_handler(lambda c: "postnotapprove_" in c.data)
 @inject
-async def save_user(
+async def post_approve(
         callback_query: types.CallbackQuery,
         repository_posts = Provide[Container.repository_posts],
         cards_service = Provide[Container.cards_service]):
     user_info = callback_query.data.split("_")
-    if user_info[0] == "postapprove":
-        post = repository_posts.get(id=user_info[1])
+    post = repository_posts.get(id=user_info[1])
+    await callback_query.message.delete()
+    if post.status != Posts.PostStatus.draft:
+        await callback_query.message.answer("Пост уже отмодерирован")
+    elif user_info[0] == "postapprove":
         repository_posts.update(
             db_obj=post,
             obj_in={
                 "status": Posts.PostStatus.published
             }
         )
-        await callback_query.message.delete()
         await callback_query.message.answer("Статус обновлён на опубликованный")
 
         await cards_service.add_raiting(user_id=post.author.id, moderator_id=callback_query.from_user.id, raiting=2_000)
@@ -68,7 +71,6 @@ async def save_user(
             message_id=message.message_id
         )
     else:
-        post = repository_posts.get(id=user_info[1])
         repository_posts.update(
             db_obj=post,
             obj_in={
@@ -76,7 +78,6 @@ async def save_user(
             }
         )
 
-        await callback_query.message.delete()
         await callback_query.message.answer("Статус обновлён на не одобренный")
         await bot.send_message(
             post.author.telegram_id,
@@ -106,7 +107,7 @@ async def process_start_command(
 @dp.callback_query_handler(lambda c: "cardapprove_" in c.data)
 @dp.callback_query_handler(lambda c: "cardnotapprove_" in c.data)
 @inject
-async def save_user(
+async def card_approve(
         callback_query: types.CallbackQuery,
         reposotory_cards = Provide[Container.reposotory_cards]):
     user_info = callback_query.data.split("_")
