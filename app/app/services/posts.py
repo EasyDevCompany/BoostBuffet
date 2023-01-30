@@ -63,7 +63,11 @@ class PostsService:
             )
             moderators = self._repository_telegram_user.get_moderators()
             for moderator in moderators:
-                await bot.send_message(moderator.telegram_id, post.telegraph_url, reply_markup=get_post_approve_buttons(post_id=post.id))
+                await bot.send_message(
+                    moderator.telegram_id,
+                    f'<b>{post.title}</b> \n{post.subtitle} \nАвтор: @{post.author.username} \n{post.telegraph_url}',
+                    reply_markup=get_post_approve_buttons(post_id=post.id)
+                )
 
         except TelegraphException as er:
             if str(er) == "TITLE_TOO_LONG":

@@ -25,7 +25,10 @@ async def process_start_command(
     if user and user.role == TelegramUser.UserRole.moderator:
         most_outdated_post = repository_posts.most_outdated_post()
         if most_outdated_post:
-            await message.answer(most_outdated_post.telegraph_url, reply_markup=get_post_approve_buttons(post_id=most_outdated_post.id))
+            await message.answer(
+                f'<b>{most_outdated_post.title}</b> \n{most_outdated_post.subtitle} \nАвтор: @{most_outdated_post.author.username} \n{most_outdated_post.telegraph_url}',
+                reply_markup=get_post_approve_buttons(post_id=most_outdated_post.id)
+            )
         else:
             await message.answer("Все посты проверены")
     else:
@@ -97,7 +100,10 @@ async def process_start_command(
     if user and user.role == TelegramUser.UserRole.moderator:
         most_outdated_card = reposotory_cards.most_outdated_card()
         if most_outdated_card:
-            await message.answer(f"{settings.WEBAPP_URL}networking/{most_outdated_card.username}", reply_markup=get_card_approve_buttons(card_id=most_outdated_card.id))
+            await message.answer(
+                f"{settings.WEBAPP_URL}networking/{most_outdated_card.username}",
+                reply_markup=get_card_approve_buttons(card_id=most_outdated_card.id)
+            )
         else:
             await message.answer("Все карты проверены")
     else:
@@ -111,15 +117,17 @@ async def card_approve(
         callback_query: types.CallbackQuery,
         reposotory_cards = Provide[Container.reposotory_cards]):
     user_info = callback_query.data.split("_")
-    if user_info[0] == "cardapprove":
-        card = reposotory_cards.get(id=user_info[1])
+    card = reposotory_cards.get(id=user_info[1])
+    await callback_query.message.delete()
+    if card and card.aprroval_status != Cards.ApprovalStatus.draft:
+        await callback_query.message.answer("Карточка уже отмодерирована")
+    elif user_info[0] == "cardapprove":
         reposotory_cards.update(
             db_obj=card,
             obj_in={
                 "aprroval_status": Cards.ApprovalStatus.approved
             }
         )
-        await callback_query.message.delete()
         await callback_query.message.answer("Статус обновлён на опубликованный")
         await bot.send_message(
             card.author.telegram_id,
@@ -127,10 +135,8 @@ async def card_approve(
             parse_mode='HTML'
         )
     else:
-        card = reposotory_cards.get(id=user_info[1])
         reposotory_cards.delete(db_obj=card, commit=True)
-        await callback_query.message.delete()
-        await callback_query.message.answer("Статус обновлён на не одобренный")
+        await callback_query.message.answer("Карточка удалена")
         await bot.send_message(
             card.author.telegram_id,
             f'Ваш карточка не была одобрена модератором',

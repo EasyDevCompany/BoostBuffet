@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 
 from typing import Optional
@@ -17,6 +18,9 @@ from app.schemas.cards import CardIn, UpdateCardIn, TagIn
 from fastapi_pagination.ext.sqlalchemy import paginate
 
 from app.logs.logger_config import catch_logs
+
+from app.telegram_bot.keyboards.moderator_keyboards import get_card_approve_buttons
+
 
 class CardsService:
 
@@ -44,7 +48,8 @@ class CardsService:
             return JSONResponse(content={"error_msg": "У вас уже существует карточка"}, status_code=403)
         if not user.username:
             return JSONResponse(content={"error_msg": "У вас отсутствует username"}, status_code=403)
-        return self._repository_cards.create(
+
+        card = self._repository_cards.create(
             obj_in={
                 "username": user.username,
                 "first_name": user.first_name,
@@ -59,6 +64,15 @@ class CardsService:
                 "aprroval_status": "draft",
             },
             commit=True)
+
+        moderators = self._repository_telegram_user.get_moderators()
+        for moderator in moderators:
+            await bot.send_message(
+                moderator.telegram_id,
+                f"{settings.WEBAPP_URL}networking/{card.username}",
+                reply_markup=get_card_approve_buttons(card_id=card.id)
+            )
+        return card
 
     @catch_logs
     async def update_card(self, update_card_in: UpdateCardIn, user_id: str):
