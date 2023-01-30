@@ -18,6 +18,7 @@ class DefaultCard(BaseModel):
     surname: Optional[str]
     raiting: str
     description: Optional[str]
+    bio: Optional[str]
     aprroval_status: str
     role: str
     proffesion: str
