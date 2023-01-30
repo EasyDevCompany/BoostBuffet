@@ -118,8 +118,11 @@ async def card_approve(
         reposotory_cards = Provide[Container.reposotory_cards]):
     user_info = callback_query.data.split("_")
     card = reposotory_cards.get(id=user_info[1])
-    await callback_query.message.delete()
-    if card and card.aprroval_status != Cards.ApprovalStatus.draft:
+    try:
+        await bot.delete_message(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id)
+    except Exception as e:
+        print(str(e))
+    if not card or card.aprroval_status != Cards.ApprovalStatus.draft:
         await callback_query.message.answer("Карточка уже отмодерирована")
     elif user_info[0] == "cardapprove":
         reposotory_cards.update(
