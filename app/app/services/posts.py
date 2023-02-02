@@ -232,6 +232,17 @@ class PostsService:
             return JSONResponse(status_code=403, content="Это не ваша черновая статья.")
         return post
 
+    @catch_logs
+    async def list_draft_posts(self, user_id: str):
+        user = self._repository_telegram_user.get(id=user_id)
+        posts = self._repository_posts.list(
+            author_id=user.id,
+            status=Posts.PostStatus.draft
+        )
+        logger.info(posts)
+        return posts
+
+    @catch_logs
     async def leader_board(self):
         leader_board_stats = self._repository_posts.users_leader_board()
         stat_list = []

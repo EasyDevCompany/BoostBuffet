@@ -176,6 +176,15 @@ async def get_draft_post(
     return await posts_service.get_draft_post(user_id=token, post_id=post_id)
 
 
+@router.get("/draft_posts", response_model=list[DefaultPosts])
+@inject
+@commit_and_close_session
+async def list_draft_post(
+    token = Depends(bot_token_verification),
+    posts_service = Depends(Provide[Container.posts_service])
+):
+    return await posts_service.list_draft_posts(user_id=token)
+
 @router.get("/leader_board", response_model=list[LeaderBoard])
 @inject
 @commit_and_close_session
