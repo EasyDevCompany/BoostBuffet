@@ -45,7 +45,7 @@ async def process_start_command(
         await bot.send_message(message.from_user.id, f"Привет, {message.from_user.username}🦄🦄🦄! \n\n{const.START_TEXT}", reply_markup=get_menu_button())
     else:
         await bot.send_message(message.from_user.id, f"Привет, {message.from_user.username}🦄🦄🦄! \n\n{const.START_TEXT}", reply_markup=get_menu_button())
-        await bot.set_chat_menu_button(
+    await bot.set_chat_menu_button(
             chat_id=message.chat.id,
             menu_button=get_menu_web_app()
         )
