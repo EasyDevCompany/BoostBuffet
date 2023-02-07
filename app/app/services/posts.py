@@ -41,13 +41,13 @@ class PostsService:
         user = self._repository_telegram_user.get(id=user_id)
         telegraph = Telegraph(user.telegraph_access_token)
         try:
-            author_url = 'https://t.me/boostbuffettest'
+            author_url = 'https://t.me/boostbuffet'
             post = telegraph.create_page(
                 post_in.title or '',
                 author_url=author_url,
                 author_name="MOOVE Медиахаб boostbuffettest",
                 html_content=post_in.content + f"<br><br>Автор: <a href='https://t.me/{user.username}'>@{user.username}</a>"
-                
+
             )
             post = self._repository_posts.create(
                 obj_in={
