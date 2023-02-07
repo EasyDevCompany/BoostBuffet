@@ -48,12 +48,6 @@ async def post_approve(
     if post.status != Posts.PostStatus.draft:
         await callback_query.message.answer("Пост уже отмодерирован")
     elif user_info[0] == "postapprove":
-        repository_posts.update(
-            db_obj=post,
-            obj_in={
-                "status": Posts.PostStatus.published
-            }
-        )
         await callback_query.message.answer("Статус обновлён на опубликованный")
 
         await cards_service.add_raiting(user_id=post.author.id, moderator_id=callback_query.from_user.id, raiting=2_000)
@@ -62,6 +56,13 @@ async def post_approve(
             settings.CHANNEL_POSTS,
             f'<b>{post.title}</b> \n{post.subtitle} \nАвтор: @{post.author.username} \n{post.telegraph_url}',
             parse_mode='HTML'
+        )
+        repository_posts.update(
+            db_obj=post,
+            obj_in={
+                "status": Posts.PostStatus.published,
+                "channel_link": message.url
+            }
         )
         await bot.send_message(
             post.author.telegram_id,
