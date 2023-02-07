@@ -148,11 +148,35 @@ class CardsService:
         card = self._repository_cards.get(author_id=user.id)
         if not card:
             return JSONResponse(content={"error_msg": "У вас нет карточки"}, status_code=403)
+
+        if card.raiting + raiting > 10_000:
+            obj_in={
+                "raiting": card.raiting + raiting,
+                "role": Cards.CardRole.legend
+            }
+        elif card.raiting + raiting > 5_000:
+            obj_in={
+                "raiting": card.raiting + raiting,
+                "role": Cards.CardRole.sage
+            }
+        elif card.raiting + raiting > 2_000:
+            obj_in={
+                "raiting": card.raiting + raiting,
+                "role": Cards.CardRole.master
+            }
+        elif card.raiting + raiting > 1_000:
+            obj_in={
+                "raiting": card.raiting + raiting,
+                "role": Cards.CardRole.adept
+            }
+        else:
+            obj_in={
+                "raiting": card.raiting + raiting,
+            }
+
         self._repository_cards.update(
             db_obj=card,
-            obj_in={
-                "raiting": card.raiting + raiting
-            }
+            obj_in=obj_in
         )
         return JSONResponse(content="Рейтинг был обновлён", status_code=200)
 
