@@ -30,7 +30,8 @@ class DefaultPosts(BaseModel):
 
 class PublishedPosts(DefaultPosts):
     views_amount: int
-    likes_amount: int
+    likes_amount: int   
+    channel_link: Optional[str]
 
     class Config:
         orm_mode = True
