@@ -35,8 +35,7 @@ class Posts(Base):
     views_count = Column(Integer, default=0)
     comments_count = Column(Integer, default=0)
     raiting = Column(Integer, default=0)
-    channel_link = Column(String, nullable=True)
-
+    url_to_post = Column(String(500), nullable=True)
     status = Column(Enum(PostStatus), default=PostStatus.draft)
     likes_amount = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
