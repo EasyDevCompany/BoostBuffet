@@ -61,7 +61,7 @@ async def post_approve(
             db_obj=post,
             obj_in={
                 "status": Posts.PostStatus.published,
-                "channel_link": message.url
+                "url_to_post": message.url
             }
         )
         await bot.send_message(

@@ -5,7 +5,7 @@ class PostsView(ModelView):
     column_list = [
         "id",
         "telegraph_url",
-        "channel_link",
+        "url_to_post",
         "path",
         "title",
         "content",
